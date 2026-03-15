@@ -14,6 +14,6 @@
    ```  
 3. Создаем PR  
    ```bash  
-   git push origin new_feature -f # f означает friendly  
+   git push origin new_feature -f # f означает feature  
    ```  
 P.S это шутка ребята не делайте так  
