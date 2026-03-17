@@ -17,3 +17,4 @@
    git push origin new_feature -f # f означает feature  
    ```  
 P.S это шутка ребята не делайте так  
+PSS ДЕЛАЙТЕ ТАК ЭТО НЕ ШУТКА
