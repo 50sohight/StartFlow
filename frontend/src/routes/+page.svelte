@@ -127,6 +127,8 @@
   <div class="max-w-4xl mx-auto text-center px-4">
     <h2 class="text-3xl font-bold text-white mb-4">Готовы упростить управление проектами?</h2>
     <p class="text-green-100 mb-8 text-lg">Присоединяйтесь к командам, которые экономят время на рутине.</p>
+    <!-- Не проверяет store, перенаправляет на аутентификацию даже если 
+     пользователь был авторизован -->
     <Button variant="secondary" href="/auth" class="bg-white text-green-600 hover:bg-gray-100 focus:ring-white">
       Начать
     </Button>
