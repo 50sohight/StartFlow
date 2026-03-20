@@ -141,7 +141,7 @@
   <!-- Затемнение фона -->
   <div 
     class="fixed inset-0 bg-black/40 z-40" 
-    onclick={() => mobileMenuOpen = false}
+    onclick={closeMobile}
     transition:fade={{ duration: 150 }}
   ></div>
 
