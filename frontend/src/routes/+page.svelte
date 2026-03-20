@@ -16,7 +16,7 @@
           <span class="block text-green-600">быстрее и умнее</span>
         </h1>
         <p class="mt-6 text-lg text-gray-600 sm:text-xl max-w-3xl mx-auto lg:mx-0">
-          Kanban-доски с готовыми шаблонами и интегрированный ИИ, который поможет вам и вашей команде сориентироваться в любой задаче за минуты.
+          Kanban-доски с готовыми шаблонами и интегрированный ИИ, который поможет вам и вашей команде сориентироваться в любой задаче за считанные секунды.
         </p>
         <div class="mt-8 flex justify-center lg:justify-start gap-4">
           <Button variant="primary" href="/auth">
@@ -126,7 +126,7 @@
     <h2 class="text-3xl font-bold text-white mb-4">Готовы упростить управление проектами?</h2>
     <p class="text-green-100 mb-8 text-lg">Присоединяйтесь к командам, которые экономят время на рутине.</p>
     <Button variant="secondary" href="/auth" class="bg-white text-green-600 hover:bg-gray-100 focus:ring-white">
-      Создать проект бесплатно
+      Начать
     </Button>
   </div>
 </section>
