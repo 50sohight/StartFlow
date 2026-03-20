@@ -111,10 +111,12 @@
     
     <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
       {#each ['Базовый Канбан', 'Scrum Sprint', 'Bug Tracker', 'Маркетинг'] as name, i}
+      <a href="/board">
         <div class="bg-white p-6 rounded-xl border border-gray-200 hover:border-green-500 cursor-pointer transition hover:shadow-md h-32 flex flex-col justify-between">
           <div class="h-12 w-12 mx-auto bg-green-50 rounded-lg mb-2 flex items-center justify-center text-green-600 font-bold">{i + 1}</div>
           <h4 class="font-semibold text-gray-800">{name}</h4>
         </div>
+      </a>
       {/each}
     </div>
   </div>
