@@ -8,12 +8,12 @@ from alembic import context
 from src.config import settings
 
 from src.database import Base
-from src.models.users import UsersOrm
-from src.models.projects import ProjectsOrm
-from src.models.project_members import ProjectMembersOrm
-from src.models.columns import ColumnsOrm
-from src.models.tasks import TasksOrm
-from src.models.task_assignees import TaskAssigneesOrm
+from src.models import UsersOrm
+from src.models import ProjectsOrm
+from src.models import ProjectMembersOrm
+from src.models import ColumnsOrm
+from src.models import TasksOrm
+from src.models import TaskAssigneesOrm
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

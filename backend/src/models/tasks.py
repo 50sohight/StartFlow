@@ -27,6 +27,6 @@ class TasksOrm(Base):
         back_populates="tasks"
     )
     users: Mapped[List["TaskAssigneesOrm"]] = relationship(
-        back_populates="tasks"
+        back_populates="task"
     )
 

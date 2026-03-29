@@ -1,9 +1,11 @@
-import sys
-from pathlib import Path
-from src.config import settings
+import uvicorn
+from fastapi import FastAPI
 
-sys.path.append(str(Path(__file__).parent.parent))
+from src.api.auth import router as router_auth
 
+app = FastAPI()
 
-if "__main__" == __name__:
-    print(settings.DB_URL)
+app.include_router(router_auth)
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True)

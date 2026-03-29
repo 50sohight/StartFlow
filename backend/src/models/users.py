@@ -11,7 +11,7 @@ class UsersOrm(Base):
     __tablename__ = "users"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid(), primary_key=True, server_default=text("gen_random_uuid()"))
-    login: Mapped[str] = mapped_column(VARCHAR(100))
+    login: Mapped[str] = mapped_column(VARCHAR(100), unique=True)
     password_hash: Mapped[str] = mapped_column(VARCHAR(255))
     fullname: Mapped[str] = mapped_column(VARCHAR(100))
 
