@@ -5,7 +5,9 @@ from loguru import logger
 from fastapi import APIRouter, HTTPException, status
 from ..llm.model_loader import VikhrRAG
 from fastapi import APIRouter, HTTPException
-from ..schemas.request import ModelRequest, ModelResponse
+from ..schemas.request import ModelRequest
+from ..schemas.request import ModelResponse
+from ..schemas.request import ChartData
 
 # Инициализация
 router = APIRouter()
@@ -31,13 +33,13 @@ async def generate(request: ModelRequest):
     mode = "chart" if request.response_type == "chart" else "rag"
     temp = request.temperature
     if mode == "chart":
-        temp = min(request.tempature, 0.3)  # Для графиков лучше поменьше температуру
+        temp = min(request.temperature, 0.3)  # Для графиков лучше поменьше температуру
 
     try:
         raw_answer = vikhr.ask_vikhr(
             user_query=request.user_query,
             documents=request.documents,
-            temperature=request.temperature,
+            temperature=temp,
             top_k=request.top_k,
             max_tokens=request.max_tokens,
             mode=mode
@@ -45,13 +47,28 @@ async def generate(request: ModelRequest):
 
     except Exception as e:
         logger.exception("Model inference failed")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Model error: {str(e)}"
-        )
+        return ModelResponse(error=f"Ошибка модели: {str(e)}")
 
     if request.response_type == "chart":
-        ...
+        try:
+            match = JSON_PATTERN.search(raw_answer)
+            if not match:
+                raise ValueError("Модель не вернула JSON, вернула текст")
 
-    return ModelResponse(text_response=raw_answer)
+            json_str = match.group(0)
+            data_dict = json.loads(json_str)
+
+            validated_chart = ChartData(**data_dict)
+
+            logger.info("Chart data successfully validated")
+            return ModelResponse(chart_data=validated_chart, raw_answer=raw_answer)
+
+        except Exception as e:
+            logger.error(f"Chart parsing error: {e}")
+            return ModelResponse(
+                error=f"Не удалось сформировать данные для графика: {str(e)}",
+                raw_answer=raw_answer
+            )
+
+    return ModelResponse(text_response=raw_answer, raw_answer=raw_answer)
 
