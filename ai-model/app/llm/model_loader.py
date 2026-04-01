@@ -7,7 +7,7 @@ from llama_cpp import Llama
 class VikhrRAG:
     # Классовые атрибуты для загрузки модели
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-    MODEL_DIR = os.path.join(CURRENT_DIR, "models")
+    MODEL_DIR = os.path.join(CURRENT_DIR, "../../models")
     MODEL_FILENAME = "Vikhr-Llama3.1-8B-Instruct-R-21-09-24.Q4_K_M.gguf"
     MODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILENAME)
     _llm_instance = None
@@ -20,7 +20,7 @@ class VikhrRAG:
         "to the question itself, using documents with these identifiers."
     )
 
-    def __init__(self, systemprompt=GROUNDED_SYSTEM_PROMPT, n_gpu_layers=20, n_ctx=2048, verbose=False):
+    def __init__(self, systemprompt=GROUNDED_SYSTEM_PROMPT, n_gpu_layers=0, n_ctx=2048, verbose=False):
         """
         Инициализация экземпляра. Параметры загрузки модели берутся из классовых атрибутов.
         :param systemprompt: Системный промпт (если None, используется GROUNDED_SYSTEM_PROMPT)
@@ -50,9 +50,9 @@ class VikhrRAG:
 
             cls._llm_instance = Llama(
                 model_path=cls.MODEL_PATH,
-                n_gpu_layers=-1,  # Только видеокарта
-                n_ctx=4096,  # Контекст
-                verbose=False  # Убрать технический мусор в консоли
+                n_gpu_layers=20,
+                n_ctx=2048,  # Контекст
+                verbose=False
             )
             print("Модель загружена!")
 
