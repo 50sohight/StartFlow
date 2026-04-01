@@ -1,36 +1,27 @@
-"""Pydantic модели для запросов"""
+"""Pydantic схемы для запросов"""
 
-from pydantic import BaseModel
-from typing import List, Optional, Any, Dict
+from pydantic import BaseModel, Field
+from typing import List, Optional, Any, Dict, Literal
+
+class ChartData(BaseModel):
+    """Схема данных для построения графика на фронтенде"""
+    labels: List[str] = Field(..., description="Названия категорий (оси X или легенда)")
+    values: List[float] = Field(..., description="Числовые значения (ось Y)")
+    title: str = Field(default="Аналитика проекта", description="Заголовок графика")
+    chart_type: str = Field(default="bar", description="Тип: bar, line, pie")
 
 class ModelRequest(BaseModel):
-    user_query: str
-    documents: List[str]
-    temparature: float = 0.3
+    user_query: str = Field(..., description="Текстовый запрос")
+    documents: List[str] = []
+    temperature: float = 0.3
     top_k: int = 40
     max_tokens: int = 2048
+    # Либо работаем с текстом - text, либо с графиком - chart
+    response_type: Literal["text", "chart"] = "text"
 
 class ModelResponse(BaseModel):
-    parsed: Optional[Dict[str, Any]]
-    raw: Optional[Any] = None  # На случай, если не получится распарсить
-    error: Optional[str] = None  # В случае, если будут ошибки
+    text_response: Optional[str] = None
+    chart_data: Optional[ChartData] = None
+    raw_answer: Optional[str] = None
 
-    # def ask_vikhr(
-    #         self,
-    #         user_query: str,
-    #         documents: List,
-    #         # Параметры генерации для ЭТАПА 2 (финальный ответ)
-    #         temperature: float = 0.3,
-    #         top_k: int = 40,
-    #         max_tokens: int = 2048
-    #         ) -> str:
-    #     """
-    #     Метод экземпляра для выполнения RAG-запросов с настраиваемыми параметрами.
-    #
-    #     :param user_query: Запрос пользователя
-    #     :param documents: Список документов для RAG
-    #     :param temperature: Температура генерации для финального ответа (0.1 - точно, 0.7 - творчески)
-    #     :param top_k: Ограничение выборки токенов
-    #     :param max_tokens: Макс длина ответа
-    #     :return: Ответ модели
-    #     """
+
