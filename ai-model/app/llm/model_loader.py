@@ -21,12 +21,24 @@ class VikhrRAG:
     )
 
     # Системный промпт для работы с графиками (только JSON)
+    # Системный промпт для работы с графиками (только JSON)
     CHART_SYSTEM_PROMPT = (
-        "You are a professional data analyst. Your task is to analyze the provided text "
-        "and extract structured data for visualization. "
-        "Return the result STRICTLY as a valid JSON object. "
-        "DO NOT add any introductory text, explanations, or markdown formatting (like `\`json). "
-        "Return ONLY the JSON object."
+        "You are a data extraction assistant. Extract chart data from text.\n"
+        "Return ONLY valid JSON. No markdown, no explanations.\n\n"
+        "SCHEMA:\n"
+        "{\n"
+        '  "title": "Chart Title",\n'
+        '  "chart_type": "bar",\n'
+        '  "labels": ["Category1", "Category2"],\n'
+        '  "values": [10, 20]\n'
+        "}\n\n"
+        "RULES:\n"
+        "1. If asked for statistics (by status, by type, etc.), 'labels' MUST be the categories (e.g., status names).\n"
+        "2. 'values' MUST be the counts of items in each category.\n"
+        "3. Do not list item names as labels. Group and count them.\n\n"
+        "EXAMPLE:\n"
+        "Input: 'Tasks: Task A (Done), Task B (Done), Task C (In Progress).'\n"
+        'Output: {"title": "Status Chart", "labels": ["Done", "In Progress"], "values": [2, 1]}'
     )
 
     def __init__(self, systemprompt=GROUNDED_SYSTEM_PROMPT, n_gpu_layers=0, n_ctx=2048, verbose=False):
@@ -93,9 +105,13 @@ class VikhrRAG:
         llm = VikhrRAG.get_llm()
 
         if mode == "chart":
+            context = ""
+            if documents:
+                context = "\n\nData from document:\n" + "\n".join(documents)
+
             messages = [
                 {"role": "system", "content": self.CHART_SYSTEM_PROMPT},
-                {"role": "user", "content": user_query}
+                {"role": "user", "content": user_query + context}
             ]
 
             try:
