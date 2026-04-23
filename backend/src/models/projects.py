@@ -21,7 +21,10 @@ class ProjectsOrm(Base):
     tasks: Mapped[List["TasksOrm"]] = relationship(back_populates="project")
     
 
-    links: Mapped[List["LinksOrm"]] = relationship(back_populates="project")
+    links: Mapped[List["LinksOrm"]] = relationship(
+        back_populates="project", 
+        cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         CheckConstraint("status IN ('активный', 'архивный')", name="check_status_valid"),

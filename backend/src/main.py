@@ -4,10 +4,21 @@ from fastapi import FastAPI
 from api.auth import router as router_auth
 from api.link_endpoints import router as router_links
 
+from api.api.users import router as router_users
+from api.api.columns import router as router_columns
+from api.api.project_members import router as router_memebers
+from api.api.projects import router as router_projects
+from api.api.tasks import router as router_tasks
+
 app = FastAPI()
 
 app.include_router(router_auth)
 app.include_router(router_links)
+app.include_router(router_users)
+app.include_router(router_columns)
+app.include_router(router_memebers)
+app.include_router(router_projects)
+app.include_router(router_tasks)
 
 
 
