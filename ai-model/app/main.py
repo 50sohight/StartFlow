@@ -42,4 +42,9 @@ app.include_router(generate.router, prefix="/api", tags=["AI Model"])
 
 @app.get("/")
 async def root():
-    return {"message": "StartFlow AI Backend is running"}
+    from .llm.model_loader import VikhrRAG
+
+    return {
+        "message": "StartFlow AI Backend is running",
+        "llm_backend": VikhrRAG.get_backend_name(),
+    }
