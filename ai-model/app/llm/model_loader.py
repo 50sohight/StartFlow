@@ -7,8 +7,12 @@ from loguru import logger
 class VikhrRAG:
     # Классовые атрибуты для загрузки модели
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-    MODEL_DIR = os.path.join(CURRENT_DIR, "../../models")
-    MODEL_FILENAME = "vikhr-llama3.1-8b-instruct-r-21-09-24-q4_k_m.gguf"
+    DEFAULT_MODEL_DIR = os.path.join(CURRENT_DIR, "../../models")
+    MODEL_DIR = os.getenv("MODEL_DIR", DEFAULT_MODEL_DIR)
+    MODEL_FILENAME = os.getenv(
+        "MODEL_FILENAME",
+        "vikhr-llama3.1-8b-instruct-r-21-09-24-q4_k_m.gguf"
+    )
     MODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILENAME)
     _llm_instance = None
 
