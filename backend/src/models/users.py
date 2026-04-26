@@ -1,9 +1,7 @@
 from typing import List
-
 from src.database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import VARCHAR, Uuid, text
-
 import uuid
 
 
@@ -17,3 +15,6 @@ class UsersOrm(Base):
 
     project_memberships: Mapped[List["ProjectMembersOrm"]] = relationship(back_populates="user")
     tasks: Mapped[List["TaskAssigneesOrm"]] = relationship(back_populates="user")
+    
+    created_links: Mapped[List["LinksOrm"]] = relationship(foreign_keys="LinksOrm.created_by", back_populates="creator")
+    used_links: Mapped[List["LinksOrm"]] = relationship(foreign_keys="LinksOrm.used_by", back_populates="user_who_used")
