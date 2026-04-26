@@ -1,5 +1,5 @@
 from typing import List
-from database import Base  # ИСПРАВЛЕНО
+from src.database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import CheckConstraint, Uuid, VARCHAR, Text, TIMESTAMP, text
 import uuid

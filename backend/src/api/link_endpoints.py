@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Cookie, status, Depends
-from database import async_session_maker
-from models import LinksOrm, ProjectMembersOrm
+from src.database import async_session_maker
+from src.models import LinksOrm, ProjectMembersOrm
 from uuid import UUID
-from config import settings
-from services.auth import AuthService
+from src.config import settings
+from src.services.auth import TokenService
 from sqlalchemy import select
 
 import datetime
@@ -14,9 +14,9 @@ router = APIRouter(prefix="/link", tags=["Ссылки-приглашения"])
 
 async def get_current_user_uuid(access_token: str | None = Cookie(default=None)):
 
-    auth_service = AuthService()
+    token_service = TokenService()
 
-    payload = auth_service.decode_token(access_token)
+    payload = token_service.decode_token(access_token)
     return UUID(payload["user_id"])
         
 

@@ -7,9 +7,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import async_session_maker
-from models.columns import ColumnsOrm
-from schemas.column import ColumnCreate, ColumnRead
+from src.database import async_session_maker
+from src.models import ColumnsOrm
+from src.schemas.column import ColumnCreate, ColumnRead
 
 
 

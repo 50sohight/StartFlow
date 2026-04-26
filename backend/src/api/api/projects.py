@@ -6,13 +6,13 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload  # <--- Убедись, что этот импорт на месте
 
-from database import async_session_maker
-from models.project_members import ProjectMembersOrm
-from models.projects import ProjectsOrm
-from models.columns import ColumnsOrm
-from models.tasks import TasksOrm
-from schemas.project import ProjectCreate, ProjectRead
-from schemas.project_member import ProjectMemberRead
+from src.database import async_session_maker
+from src.models import ProjectMembersOrm
+from src.models import ProjectsOrm
+from src.models import ColumnsOrm
+from src.models import TasksOrm
+from src.schemas.project import ProjectCreate, ProjectRead
+from src.schemas.project_member import ProjectMemberRead
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 

@@ -6,9 +6,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from database import async_session_maker
-from models.project_members import ProjectMembersOrm
-from schemas.project_member import ProjectMemberRead, ProjectMemberUpdate
+from src.database import async_session_maker
+from src.models import ProjectMembersOrm
+from src.schemas.project_member import ProjectMemberRead, ProjectMemberUpdate
 
 
 

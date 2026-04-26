@@ -5,9 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database import async_session_maker
-from models.tasks import TasksOrm
-from schemas.task import TaskCreate, TaskRead
+from src.database import async_session_maker
+from src.models import TasksOrm
+from src.schemas.task import TaskCreate, TaskRead
 
 
 
