@@ -1,3 +1,5 @@
+from typing import List
+
 from src.database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Uuid, VARCHAR, ForeignKey, text
@@ -14,4 +16,4 @@ class ColumnsOrm(Base):
     position: Mapped[int]
 
     project: Mapped["ProjectsOrm"] = relationship(back_populates="columns")
-    tasks: Mapped["TasksOrm"] = relationship(back_populates="column")
+    tasks: Mapped[List["TasksOrm"]] = relationship(back_populates="column")

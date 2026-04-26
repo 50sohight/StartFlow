@@ -1,9 +1,7 @@
 from typing import List
-
 from src.database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import CheckConstraint, Uuid, VARCHAR, Text, TIMESTAMP, text
-
 import uuid
 from datetime import datetime
 
@@ -18,20 +16,16 @@ class ProjectsOrm(Base):
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
     updated_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
 
-    members: Mapped[List["ProjectMembersOrm"]] = relationship(
-        back_populates="project"
-    )
-    columns: Mapped[List["ColumnsOrm"]] = relationship(
-        back_populates="project"
-    )
-    tasks: Mapped[List["TasksOrm"]] = relationship(
-        back_populates="project"
+    members: Mapped[List["ProjectMembersOrm"]] = relationship(back_populates="project")
+    columns: Mapped[List["ColumnsOrm"]] = relationship(back_populates="project")
+    tasks: Mapped[List["TasksOrm"]] = relationship(back_populates="project")
+    
+
+    links: Mapped[List["LinksOrm"]] = relationship(
+        back_populates="project", 
+        cascade="all, delete-orphan"
     )
 
     __table_args__ = (
         CheckConstraint("status IN ('активный', 'архивный')", name="check_status_valid"),
     )
-
-
-
-
