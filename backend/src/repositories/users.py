@@ -7,7 +7,10 @@ class UsersRepository(BaseRepository):
     model = UsersOrm
     schema = User
 
-    async def get_user_with_hashed_password(self, login: str):
+    async def get_user_with_hashed_password(self, login: str) -> UserWithHashedPassword:
+        """
+        Возвращает по логину, схему UserWithHashedPassword
+        """
         stmt = select(self.model).filter_by(login=login)
         result = await self.session.execute(stmt)
         model = result.scalars().one_or_none()

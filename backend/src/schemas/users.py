@@ -6,7 +6,7 @@ class UserRequestLogin(BaseModel):
     login: str
     password: str
 
-class UserRequestAdd(BaseModel):
+class UserRequestAdd(BaseModel):#UserCreate
     login: str
     fullname: str
     password: str
@@ -16,7 +16,7 @@ class UserAdd(BaseModel):
     fullname: str
     password_hash: str
 
-class User(BaseModel):
+class User(BaseModel):#UserRead
     id: uuid.UUID
     login: str
     fullname: str
