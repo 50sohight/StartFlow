@@ -1,27 +1,17 @@
+import asyncio
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
-
+from sqlalchemy.ext.asyncio import create_async_engine
 from src.config import settings
-
 from src.database import Base
-from src.models import UsersOrm
-from src.models import ProjectsOrm
-from src.models import ProjectMembersOrm
-from src.models import ColumnsOrm
-from src.models import TasksOrm
-from src.models import TaskAssigneesOrm
-from src.models import LinksOrm
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-#config.set_main_option("sqlalchemy.url", settings.DB_URL+"?async_fallback=True")
-config.set_main_option("sqlalchemy.url", f"{settings.DB_URL}?async_fallback=True")
+# Use pure async URL
+config.set_main_option("sqlalchemy.url", settings.DB_URL)
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
@@ -63,29 +53,30 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
+def wrap_to_sync(connection):
+    """Helper that receives a synchronous connection from run_sync()."""
+    context.configure(connection=connection, target_metadata=target_metadata)
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+async def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
-    In this scenario we need to create an Engine
+    In this scenario we need to create an AsyncEngine
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
+    connectable = create_async_engine(
+        config.get_main_option("sqlalchemy.url"),
     )
 
-    with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
-
-        with context.begin_transaction():
-            context.run_migrations()
+    async with connectable.connect() as connection:
+        # run_sync() gives us a synchronous connection inside the async loop
+        await connection.run_sync(wrap_to_sync)
 
 
 if context.is_offline_mode():
     run_migrations_offline()
 else:
-    run_migrations_online()
+    asyncio.run(run_migrations_online())
