@@ -1,26 +1,24 @@
 <script>
-  import { authStore } from '$lib/stores/authStore';
-  import Button from '$lib/components/ui/Button.svelte';
+  import { authStore } from '$lib/stores/authStore.js';
   import { goto } from '$app/navigation';
-  import { ArrowLeft } from 'lucide-svelte';
+  import Button from '$lib/components/ui/Button.svelte';
 
-  let email = '';
+  let login = '';
   let password = '';
+  let error = '';
   let loading = false;
-  let error = null;
 
   async function handleLogin() {
+    error = '';
+    if (!login || !password) {
+      error = 'Введите логин и пароль';
+      return;
+    }
     loading = true;
-    error = null;
-    
     try {
-      if (email.length > 0 && password.length > 0) {
-        await authStore.login(email, password);
-        goto('/dashboard'); 
-      } else {
-        error = 'Введите email и пароль';
-      }
-    } catch (e) {
+      await authStore.login(login, password);
+      goto('/dashboard');
+    } catch {
       error = 'Ошибка авторизации';
     } finally {
       loading = false;
@@ -34,7 +32,6 @@
     <div class="mx-auto w-full max-w-sm">
       
       <a href="/" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 mb-8">
-        <ArrowLeft size="16" class="mr-2" />
         Назад на главную
       </a>
 
@@ -51,14 +48,14 @@
         {/if}
 
         <div>
-          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <label for="login" class="block text-sm font-medium text-gray-700">Логин</label>
           <input 
-            id="email" 
-            type="email" 
-            bind:value={email}
+            id="login" 
+            type="text"
+            bind:value={login}
             required
             class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
-            placeholder="you@example.com"
+            placeholder="your_login"
           />
         </div>
 

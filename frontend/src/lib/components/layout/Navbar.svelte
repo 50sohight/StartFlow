@@ -44,8 +44,7 @@
 
       <!-- Правая часть: Кнопки / Профиль -->
       <div class="hidden md:flex items-center space-x-4">
-        {#if $authStore.id}
-          <!-- Кнопка открытия панели профиля -->
+        {#if $authStore}
           <button 
             onclick={toggleDropdown} 
             class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition"
@@ -57,10 +56,10 @@
             <ChevronDown size="16" class="text-gray-400" />
           </button>
         {:else}
-          <Button variant="secondary" href="/auth">Войти</Button>
-          <Button variant="primary" href="/auth">Регистрация</Button>
-        {/if}
-      </div>
+            <Button variant="secondary" href="/auth/login">Войти</Button>
+            <Button variant="primary" href="/auth/register">Регистрация</Button>
+          {/if}
+        </div>
 
       <!-- Мобильный бургер -->
       <div class="md:hidden flex items-center">

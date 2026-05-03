@@ -1,46 +1,63 @@
+// src/lib/stores/authStore.js
 import { writable } from 'svelte/store';
-import { browser } from '$app/environment';
 
-const defaultUser = {
-  id: null,
-  email: '',
-  name: ''
-};
+const BASE_URL = 'http://localhost:8000/auth';
 
-// Загрузка из localStorage при инициализации (если есть)
 function createAuthStore() {
-  const storedUser = browser && localStorage.getItem('user') 
-    ? JSON.parse(localStorage.getItem('user')) 
-    : defaultUser;
+  const { subscribe, set } = writable(null);
 
-  const { subscribe, set, update } = writable(storedUser);
+  async function loadUser() {
+    try {
+      const res = await fetch(`${BASE_URL}/me`, {
+        credentials: 'include'
+      });
+      if (!res.ok) {
+        set(null);
+        return null;
+      }
+      const user = await res.json();
+      set(user);
+      return user;
+    } catch {
+      set(null);
+      return null;
+    }
+  }
 
   return {
     subscribe,
-    // Имитация Егора Сыропятов
-    login: (email, password) => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const user = {
-            id: 1,
-            email: email,
-            name: 'Егор Сыропятов', 
-            avatar: 'EC'
-          };
-          set(user);
-          if (browser) {
-            localStorage.setItem('user', JSON.stringify(user));
-          }
-          resolve(true);
-        }, 1000); 
+
+    login: async (login, password) => {
+      const res = await fetch(`${BASE_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ login, password })
       });
+      if (!res.ok) throw new Error('Ошибка авторизации');
+      await loadUser();
     },
-    logout: () => {
-      set(defaultUser);
-      if (browser) {
-        localStorage.removeItem('user');
-      }
-    }
+
+    register: async (fullname, login, password) => {
+      const res = await fetch(`${BASE_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ fullname, login, password })
+      });
+      if (!res.ok) throw new Error('Ошибка регистрации');
+      await loadUser();
+    },
+
+    logout: async () => {
+      await fetch(`${BASE_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      set(null);
+    },
+
+    fetchUser: loadUser
   };
 }
 
