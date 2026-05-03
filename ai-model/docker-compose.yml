@@ -6,7 +6,7 @@ services:
       dockerfile: Dockerfile
     image: startflow-ai-model:latest
     ports:
-      - "8000:8000"
+      - "8075:8069"
     environment:
       MODEL_DIR: /service/models
       MODEL_FILENAME: ${MODEL_FILENAME:-vikhr-llama3.1-8b-instruct-r-21-09-24-q4_k_m.gguf}
