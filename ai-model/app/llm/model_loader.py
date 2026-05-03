@@ -7,8 +7,12 @@ from loguru import logger
 class VikhrRAG:
     # Классовые атрибуты для загрузки модели
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-    MODEL_DIR = os.path.join(CURRENT_DIR, "../../models")
-    MODEL_FILENAME = "Vikhr-Llama3.1-8B-Instruct-R-21-09-24.Q4_K_M.gguf"
+    DEFAULT_MODEL_DIR = os.path.join(CURRENT_DIR, "../../models")
+    MODEL_DIR = os.getenv("MODEL_DIR", DEFAULT_MODEL_DIR)
+    MODEL_FILENAME = os.getenv(
+        "MODEL_FILENAME",
+        "vikhr-llama3.1-8b-instruct-r-21-09-24-q4_k_m.gguf"
+    )
     MODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILENAME)
     _llm_instance = None
 
@@ -70,10 +74,13 @@ class VikhrRAG:
 
             logger.info(f"Загрузка модели из {cls.MODEL_PATH}...")
 
+            n_gpu_layers = int(os.getenv("N_GPU_LAYERS", "0"))
+            n_ctx = int(os.getenv("N_CTX", "2048"))
+
             cls._llm_instance = Llama(
                 model_path=cls.MODEL_PATH,
-                n_gpu_layers=20,
-                n_ctx=2048,  # Контекст
+                n_gpu_layers=n_gpu_layers,
+                n_ctx=n_ctx,  # Контекст
                 verbose=False
             )
             logger.success("Модель успешно загружена")

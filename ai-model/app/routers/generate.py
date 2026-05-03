@@ -3,11 +3,9 @@ import re
 
 from loguru import logger
 from fastapi import APIRouter, HTTPException, status
+
 from ..llm.model_loader import VikhrRAG
-from fastapi import APIRouter, HTTPException
-from ..schemas.request import ModelRequest
-from ..schemas.request import ModelResponse
-from ..schemas.request import ChartData
+from ..schemas.request import ModelRequest, ModelResponse, ChartData
 
 # Инициализация
 router = APIRouter()
@@ -17,7 +15,7 @@ JSON_PATTERN = re.compile(r'\{.*\}', re.DOTALL)
 
 @router.post("/generate",
              response_model=ModelResponse,
-             summary="Генерация текста лии графиков на основе данных проекта")
+             summary="Генерация текста или графиков на основе данных проекта")
 async def generate(request: ModelRequest):
     """
     Универсальный эндпоинт для вызова модели.
@@ -42,12 +40,21 @@ async def generate(request: ModelRequest):
             temperature=temp,
             top_k=request.top_k,
             max_tokens=request.max_tokens,
-            mode=mode
+            mode=mode,
         )
-
     except Exception as e:
         logger.exception("Model inference failed")
-        return ModelResponse(error=f"Ошибка модели: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Модель недоступна или не смогла сгенерировать ответ",
+        ) from e
+
+    if not raw_answer or not raw_answer.strip():
+        logger.error("Model returned empty answer")
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Модель вернула пустой ответ",
+        )
 
     if request.response_type == "chart":
         try:
@@ -63,12 +70,13 @@ async def generate(request: ModelRequest):
             logger.info("Chart data successfully validated")
             return ModelResponse(chart_data=validated_chart, raw_answer=raw_answer)
 
+
         except Exception as e:
-            logger.error(f"Chart parsing error: {e}")
-            return ModelResponse(
-                error=f"Не удалось сформировать данные для графика: {str(e)}",
-                raw_answer=raw_answer
-            )
+            logger.debug(f"Raw model answer: {raw_answer}")
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Не удалось преобразовать ответ модели в данные графика",
+            ) from e
 
     return ModelResponse(text_response=raw_answer, raw_answer=raw_answer)
 
