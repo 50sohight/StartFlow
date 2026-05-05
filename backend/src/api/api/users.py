@@ -5,11 +5,16 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
+from src.api.dependencies import UserIdDep 
 from src.database import async_session_maker
 from src.models import UsersOrm
 from src.schemas.users import UserRequestAdd, User
+from src.models import ProjectsOrm, ProjectMembersOrm 
+from src.schemas.project import ProjectRead
 
+from typing import List
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -32,6 +37,25 @@ async def list_users(session: SessionDep) -> list[User]:
     result = await session.execute(select(UsersOrm).order_by(UsersOrm.login))
     return list(result.scalars().all())
 
+
+
+
+@router.get("/my_projects", response_model=List[ProjectRead])
+async def get_user_projects(
+    user_id: UserIdDep,
+    session: SessionDep
+) -> List[ProjectRead]:
+    projects = await session.execute(
+        select(ProjectsOrm)
+        .options(
+            selectinload(ProjectsOrm.columns),
+            selectinload(ProjectsOrm.tasks),
+            selectinload(ProjectsOrm.members).selectinload(ProjectMembersOrm.user)
+        )
+        .join(ProjectMembersOrm, ProjectsOrm.id == ProjectMembersOrm.project_id)
+        .where(ProjectMembersOrm.user_id == user_id)
+    )
+    return projects.unique().scalars().all()
 
 @router.get("/{user_id}", response_model=User)
 async def get_user(user_id: UUID, session: SessionDep) -> User:
