@@ -9,12 +9,10 @@ from src.api.api.users import router as router_users
 from src.api.auth import router as router_auth
 from src.api.link_endpoints import router as router_links
 
+# app = FastAPI(openapi_prefix="/api")
 app = FastAPI()
 
 origins = [
-    "http://localhost",
-    "http://localhost:3000",
-    "http://localhost:5173",
     "http://localhost:3000",
     "http://localhost:5173",
 ]

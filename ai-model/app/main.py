@@ -42,7 +42,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(generate.router, prefix="/api", tags=["AI Model"])
+app.include_router(generate.router, prefix="/ai", tags=["AI Model"])
 
 
 @app.get("/")
