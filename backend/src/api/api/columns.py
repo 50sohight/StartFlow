@@ -49,14 +49,6 @@ async def get_column(column_id: UUID, session: SessionDep) -> ColumnRead:
     status_code=status.HTTP_201_CREATED,
 )
 async def create_column(payload: ColumnCreate, session: SessionDep) -> ColumnRead:
-    # # Простая проверка уникальности колонки.
-    # existing = await session.execute(select(ColumnsOrm).where(ColumnsOrm.name == payload.name))
-    # if existing.scalar_one_or_none() is not None:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_409_CONFLICT,
-    #         detail="Column with this name already exists",
-    #     )
-
     column = ColumnsOrm(
         project_id=payload.project_id, name=payload.name, position=payload.position
     )
