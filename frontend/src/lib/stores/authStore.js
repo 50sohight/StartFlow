@@ -49,13 +49,17 @@ function createAuthStore() {
       await loadUser();
     },
 
-    logout: async () => {
+  logout: async () => {
+    set(null);
+    try {
       await fetch(`${BASE_URL}/logout`, {
         method: 'POST',
         credentials: 'include'
       });
-      set(null);
-    },
+    } catch {
+      // If the request fails, the user is still logged out locally.
+    }
+  },
 
     fetchUser: loadUser
   };

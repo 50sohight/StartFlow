@@ -17,8 +17,8 @@
   const toggleMobile = () => mobileMenuOpen = !mobileMenuOpen;
   const closeMobile = () => mobileMenuOpen = false;
 
-  const handleLogout = () => {
-    authStore.logout();
+  const handleLogout = async () => {
+    await authStore.logout();
     dropdownOpen = false;
     window.location.href = '/'; 
   };
@@ -53,7 +53,6 @@
             onclick={toggleDropdown} 
             class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition"
           >
-            <!-- 🆕 use computed avatar and actual fullname -->
             <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold text-sm">
               {avatar}
             </div>
@@ -105,13 +104,11 @@
     <!-- Информация о пользователе -->
     <div class="p-4 border-b border-gray-100">
       <div class="flex items-center space-x-3 mb-3">
-        <!-- 🆕 same avatar and fullname -->
         <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">
           {avatar}
         </div>
         <div>
           <p class="font-semibold text-gray-900">{$authStore.fullname}</p>
-          <!-- 🆕 Email not available, so we show login instead -->
           <p class="text-sm text-gray-500 truncate">{$authStore.login}</p>
         </div>
       </div>
