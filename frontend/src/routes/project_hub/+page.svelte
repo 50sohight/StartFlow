@@ -46,7 +46,7 @@
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Управление проектами</h1>
 
     <div class="mb-8">
-      <Button variant="primary" on:click={() => goto('/create_new_project')} class="w-full">
+      <Button variant="primary" onclick={() => goto('/create_new_project')} class="w-full">
         Создать новый проект
       </Button>
     </div>
@@ -62,8 +62,13 @@
         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none"
       />
       <div class="mt-3">
-        <Button variant="secondary" on:click={handleJoin} class="w-full">
+        <Button variant="secondary" onclick={handleJoin} class="w-full">
           Присоединиться
+        </Button>
+      </div>
+      <div class="mt-3">
+        <Button variant="secondary" onclick={() => goto('/projects')} class="w-full">
+          Перейти к проектам
         </Button>
       </div>
 
@@ -75,7 +80,7 @@
           {message}
           {#if messageType === 'success'}
             <div class="mt-2">
-              <Button variant="primary" on:click={() => goto('/projects')}>
+              <Button variant="primary" onclick={() => goto('/projects')}>
                 Перейти к проектам
               </Button>
             </div>
