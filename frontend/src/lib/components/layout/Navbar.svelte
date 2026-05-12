@@ -6,13 +6,17 @@
   
   let dropdownOpen = $state(false);
   let mobileMenuOpen = $state(false);
-  
+
+  let avatar = $derived(
+    ($authStore?.fullname.split(' ').map(x => x.at(0)).join('') || '').toUpperCase()
+  );
+
   const toggleDropdown = () => dropdownOpen = !dropdownOpen;
   const closeDropdown = () => dropdownOpen = false;
 
   const toggleMobile = () => mobileMenuOpen = !mobileMenuOpen;
   const closeMobile = () => mobileMenuOpen = false;
-  
+
   const handleLogout = () => {
     authStore.logout();
     dropdownOpen = false;
@@ -49,10 +53,11 @@
             onclick={toggleDropdown} 
             class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition"
           >
+            <!-- 🆕 use computed avatar and actual fullname -->
             <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold text-sm">
-              {$authStore.avatar}
+              {avatar}
             </div>
-            <span class="text-gray-700 font-medium">{$authStore.name}</span>
+            <span class="text-gray-700 font-medium">{$authStore.fullname}</span>
             <ChevronDown size="16" class="text-gray-400" />
           </button>
         {:else}
@@ -100,12 +105,14 @@
     <!-- Информация о пользователе -->
     <div class="p-4 border-b border-gray-100">
       <div class="flex items-center space-x-3 mb-3">
+        <!-- 🆕 same avatar and fullname -->
         <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">
-          {$authStore.avatar}
+          {avatar}
         </div>
         <div>
-          <p class="font-semibold text-gray-900">{$authStore.name}</p>
-          <p class="text-sm text-gray-500 truncate">{$authStore.email}</p>
+          <p class="font-semibold text-gray-900">{$authStore.fullname}</p>
+          <!-- 🆕 Email not available, so we show login instead -->
+          <p class="text-sm text-gray-500 truncate">{$authStore.login}</p>
         </div>
       </div>
     </div>
