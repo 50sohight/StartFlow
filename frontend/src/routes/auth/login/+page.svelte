@@ -17,7 +17,7 @@
     loading = true;
     try {
       await authStore.login(login, password);
-      goto('/dashboard');
+      goto('/projects');
     } catch {
       error = 'Ошибка авторизации';
     } finally {

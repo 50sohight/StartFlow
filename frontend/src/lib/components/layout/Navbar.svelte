@@ -113,7 +113,7 @@
     <!-- Навигация панели -->
     <nav class="flex-1 p-2">
       <a 
-        href="/dashboard" 
+        href="/projects" 
         onclick={closeDropdown}
         class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition group"
       >
@@ -170,14 +170,14 @@
     <!-- Блок авторизации внизу -->
     <div class="p-4 border-t border-gray-100 mt-auto">
       {#if $authStore.id}
-        <a href="/dashboard" class="block w-full text-center px-4 py-2.5 mb-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium" onclick = {closeMobile}>
-          Дашборд
+        <a href="/projects" class="block w-full text-center px-4 py-2.5 mb-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium" onclick = {closeMobile}>
+          Проекты
         </a>
         <button onclick={handleLogout} class="block w-full text-center px-4 py-2.5 rounded-lg text-red-600 border border-red-200 hover:bg-red-50 font-medium">
           Выйти
         </button>
       {:else}
-        <Button variant="primary" href="/auth" class="w-full">Войти</Button>
+        <Button variant="primary" href="/auth/login" class="w-full">Войти</Button>
       {/if}
     </div>
   </div>

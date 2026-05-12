@@ -87,5 +87,16 @@ export const templates: BoardTemplate[] = [
       { id: 'e-2', title: 'В процессе', tasks: [] },
       { id: 'e-3', title: 'Готово', tasks: [] },
     ]
+  },
+  {
+    id: "ss",
+    name: "SyropyatovSpecial",
+    description: "Специальный шаблон от Егора Сыропятова (TM), призванный \
+    в разы ускорить разработку продуктов",
+    columns: [
+      { id: "d-1", title: "Начать", tasks: [{id: "col-1", title: "Делайть бабки"}]},
+      { id: "d-2", title: "Сделать", tasks: [] },
+      { id: "d-3", title: "Кончить", tasks: [] },
+    ]
   }
 ];

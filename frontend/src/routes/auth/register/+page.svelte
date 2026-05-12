@@ -19,7 +19,7 @@
     loading = true;
     try {
       await authStore.register(fullname, login, password);
-      goto('/dashboard');
+      goto('/projects');
     } catch (e) {
       error = 'Ошибка регистрации. Возможно, логин уже занят.';
     } finally {

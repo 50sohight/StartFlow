@@ -4,9 +4,9 @@
   import { goto } from '$app/navigation';
   import Button from '$lib/components/ui/Button.svelte';
 
-  let code = '';
-  let message = '';
-  let messageType = ''; // 'success' | 'error'
+  let code = $state('');
+  let message = $state('');
+  let messageType = $state(''); // 'success' | 'error'
 
   onMount(async () => {
     await authStore.fetchUser();

@@ -6,14 +6,17 @@
   import { generateProjectReport } from '$lib/ai.js';
   import Button from '$lib/components/ui/Button.svelte';
 
-  let project = null;
-  let report = '';
-  let loading = true;
-  let error = '';
+  let project = $state(null);
+  let report = $state('');
+  let loading = $state(true);
+  let error = $state('');
 
   const API_BASE = 'http://localhost:8000';
 
-  $: projectId = $page.params.project_id;
+  // $: projectId = $page.params.project_id;
+  // static for testing do dynamic like above 
+  // but it doesn't work with this syntax
+  let projectId = "513b1268-5907-43a2-9c09-7bd75ee3c345";
 
   onMount(async () => {
     await authStore.fetchUser();

@@ -19,7 +19,7 @@
           Kanban-доски с готовыми шаблонами и интегрированный ИИ, который поможет вам и вашей команде сориентироваться в любой задаче за считанные секунды.
         </p>
         <div class="mt-8 flex justify-center lg:justify-start gap-4">
-          <Button variant="primary" href="/auth">
+          <Button variant="primary" href="/auth/register">
             Начать бесплатно <ArrowRight size="18" class="ml-2" />
           </Button>
           <Button variant="secondary">Смотреть демо</Button>
@@ -111,7 +111,7 @@
     
     <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
       {#each ['Базовый Канбан', 'Scrum Sprint', 'Bug Tracker', 'Маркетинг'] as name, i}
-      <a href="/board">
+      <a href="/project_hub">
         <div class="bg-white p-6 rounded-xl border border-gray-200 hover:border-green-500 cursor-pointer transition hover:shadow-md h-32 flex flex-col justify-between">
           <div class="h-12 w-12 mx-auto bg-green-50 rounded-lg mb-2 flex items-center justify-center text-green-600 font-bold">{i + 1}</div>
           <h4 class="font-semibold text-gray-800">{name}</h4>
@@ -129,7 +129,7 @@
     <p class="text-green-100 mb-8 text-lg">Присоединяйтесь к командам, которые экономят время на рутине.</p>
     <!-- Не проверяет store, перенаправляет на аутентификацию даже если 
      пользователь был авторизован -->
-    <Button variant="secondary" href="/auth" class="bg-white text-green-600 hover:bg-gray-100 focus:ring-white">
+    <Button variant="secondary" href="/auth/register" class="bg-white text-green-600 hover:bg-gray-100 focus:ring-white">
       Начать
     </Button>
   </div>
