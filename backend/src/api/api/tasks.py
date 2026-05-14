@@ -4,12 +4,9 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.database import async_session_maker
 from src.models import TasksOrm
 from src.schemas.task import TaskCreate, TaskRead
-
-
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -32,7 +29,9 @@ async def list_tasks(session: SessionDep) -> list[TaskRead]:
 async def get_task(task_id: UUID, session: SessionDep) -> TaskRead:
     task = await session.get(TasksOrm, task_id)
     if task is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+        )
     return task
 
 
@@ -51,7 +50,7 @@ async def create_task(payload: TaskCreate, session: SessionDep) -> TaskRead:
         description=payload.description,
         deadline=payload.deadline,
         project_id=payload.project_id,
-        column_id=payload.column_id
+        column_id=payload.column_id,
     )
 
     session.add(task)
@@ -64,8 +63,31 @@ async def create_task(payload: TaskCreate, session: SessionDep) -> TaskRead:
 async def delete_task(task_id: UUID, session: SessionDep) -> None:
     task = await session.get(TasksOrm, task_id)
     if task is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+        )
 
     await session.delete(task)
     await session.commit()
     return None
+
+
+@router.patch("/{task_id}", response_model=TaskRead)
+async def update_task(
+    task_id: UUID,
+    payload: TaskUpdate,
+    session: SessionDep,
+) -> TaskRead:
+    task = await session.get(TasksOrm, task_id)
+    if task is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
+        )
+
+    update_data = payload.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(task, key, value)
+
+    await session.commit()
+    await session.refresh(task)
+    return task

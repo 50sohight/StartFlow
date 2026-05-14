@@ -7,7 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from src.database import async_session_maker
 from src.models import ColumnsOrm
-from src.schemas.column import ColumnCreate, ColumnCreateResponse, ColumnRead
+from src.schemas.column import (
+    ColumnCreate,
+    ColumnCreateResponse,
+    ColumnRead,
+    ColumnUpdate,
+)
 
 router = APIRouter(prefix="/columns", tags=["columns"])
 
@@ -70,3 +75,30 @@ async def delete_column(column_id: UUID, session: SessionDep) -> None:
     await session.delete(column)
     await session.commit()
     return None
+
+
+@router.patch("/{column_id}", response_model=ColumnRead)
+async def update_column(
+    column_id: UUID,
+    payload: ColumnUpdate,
+    session: SessionDep,
+) -> ColumnRead:
+    column = await session.get(ColumnsOrm, column_id)
+    if column is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Column not found"
+        )
+
+    update_data = payload.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(column, key, value)
+
+    await session.commit()
+    # reload with tasks
+    stmt = (
+        select(ColumnsOrm)
+        .where(ColumnsOrm.id == column_id)
+        .options(selectinload(ColumnsOrm.tasks))
+    )
+    refreshed = (await session.execute(stmt)).scalar_one()
+    return refreshed
