@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import async_session_maker
 from src.models import TasksOrm
-from src.schemas.task import TaskCreate, TaskRead
+from src.schemas.task import TaskCreate, TaskRead, TaskUpdate
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -37,14 +37,6 @@ async def get_task(task_id: UUID, session: SessionDep) -> TaskRead:
 
 @router.post("", response_model=TaskRead, status_code=status.HTTP_201_CREATED)
 async def create_task(payload: TaskCreate, session: SessionDep) -> TaskRead:
-    # # Простая проверка уникальности таски.
-    # existing = await session.execute(select(TasksOrm).where(TasksOrm.title == payload.title))
-    # if existing.scalar_one_or_none() is not None:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_409_CONFLICT,
-    #         detail="Task with this title already exists",
-    #     )
-
     task = TasksOrm(
         title=payload.title,
         description=payload.description,
