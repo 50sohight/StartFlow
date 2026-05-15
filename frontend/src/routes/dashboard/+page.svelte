@@ -27,7 +27,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
       <div>
         <h1 class="text-2xl font-bold text-gray-900">Добро пожаловать, {$authStore.name}!</h1>
-        <p class="text-gray-500">Вот ваши активные проекты.</p>
+        <p class="text-gray-500">Ваши активные проекты.</p>
       </div>
       <Button variant="primary" href="/board">
         <Plus size="18" class="mr-2" /> Новый проект

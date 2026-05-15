@@ -1,17 +1,18 @@
 from typing import Annotated
 from uuid import UUID
 
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from sqlalchemy.orm import selectinload
 from src.database import async_session_maker
 from src.models import ColumnsOrm
-from src.schemas.column import ColumnCreate, ColumnRead
-
-
+from src.schemas.column import (
+    ColumnCreate,
+    ColumnCreateResponse,
+    ColumnRead,
+    ColumnUpdate,
+)
 
 router = APIRouter(prefix="/columns", tags=["columns"])
 
@@ -33,28 +34,28 @@ async def list_columns(session: SessionDep) -> list[ColumnRead]:
 
 @router.get("/{column_id}", response_model=ColumnRead)
 async def get_column(column_id: UUID, session: SessionDep) -> ColumnRead:
-    stmt = select(ColumnsOrm).where(ColumnsOrm.id == column_id).options(selectinload(ColumnsOrm.tasks))
+    stmt = (
+        select(ColumnsOrm)
+        .where(ColumnsOrm.id == column_id)
+        .options(selectinload(ColumnsOrm.tasks))
+    )
     column = (await session.execute(stmt)).scalar_one_or_none()
-    
+
     if column is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Column not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Column not found"
+        )
     return column
 
 
-@router.post("", response_model=ColumnRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=ColumnCreateResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_column(payload: ColumnCreate, session: SessionDep) -> ColumnRead:
-    # Простая проверка уникальности колонки.
-    existing = await session.execute(select(ColumnsOrm).where(ColumnsOrm.name == payload.name))
-    if existing.scalar_one_or_none() is not None:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Column with this name already exists",
-        )
-
     column = ColumnsOrm(
-        project_id=payload.project_id,
-        name=payload.name,
-        position=payload.position
+        project_id=payload.project_id, name=payload.name, position=payload.position
     )
 
     session.add(column)
@@ -67,8 +68,37 @@ async def create_column(payload: ColumnCreate, session: SessionDep) -> ColumnRea
 async def delete_column(column_id: UUID, session: SessionDep) -> None:
     column = await session.get(ColumnsOrm, column_id)
     if column is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Column not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Column not found"
+        )
 
     await session.delete(column)
     await session.commit()
     return None
+
+
+@router.patch("/{column_id}", response_model=ColumnRead)
+async def update_column(
+    column_id: UUID,
+    payload: ColumnUpdate,
+    session: SessionDep,
+) -> ColumnRead:
+    column = await session.get(ColumnsOrm, column_id)
+    if column is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Column not found"
+        )
+
+    update_data = payload.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(column, key, value)
+
+    await session.commit()
+    # reload with tasks
+    stmt = (
+        select(ColumnsOrm)
+        .where(ColumnsOrm.id == column_id)
+        .options(selectinload(ColumnsOrm.tasks))
+    )
+    refreshed = (await session.execute(stmt)).scalar_one()
+    return refreshed
