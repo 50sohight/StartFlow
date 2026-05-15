@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/state';          // reactive page object (rune)
   import KanbanBoard from '$lib/components/ui/Kanban.svelte';
+  import { goto } from '$app/navigation';
   import type { Column, Task } from '$lib/data/templates';
 
   let projectId = page.params.project_id;    // derived from rune, no $ needed
@@ -164,22 +165,28 @@
 
 <div class="p-4 md:p-6 bg-gray-100 h-[calc(100vh-64px)] overflow-auto flex flex-col">
   <div class="mb-4 flex items-center gap-4 flex-wrap border-b border-gray-200 pb-4">
-    <h1 class="text-2xl font-bold text-gray-800">{projectName}</h1>
-    <div class="flex gap-2 ml-auto">
-      {#if unsavedChanges}
-        <span class="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-full self-center">
-          Есть несохранённые изменения
-        </span>
-      {/if}
-      <button
-        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
-        onclick={save}
-        disabled={saving || !unsavedChanges}
-      >
-        {saving ? 'Сохранение...' : 'Сохранить'}
-      </button>
-    </div>
+  <h1 class="text-2xl font-bold text-gray-800">{projectName}</h1>
+  <div class="flex gap-2 ml-auto">
+    {#if unsavedChanges}
+      <span class="text-sm text-amber-600 bg-amber-50 px-3 py-1 rounded-full self-center">
+        Есть несохранённые изменения
+      </span>
+    {/if}
+    <button
+      class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition"
+      onclick={() => goto(`/projects/${projectId}/analytics`)}
+    >
+      Аналитика
+    </button>
+    <button
+      class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+      onclick={save}
+      disabled={saving || !unsavedChanges}
+    >
+      {saving ? 'Сохранение...' : 'Сохранить'}
+    </button>
   </div>
+</div>
 
   {#if error}
     <div class="mb-4 p-3 bg-red-100 border border-red-300 text-red-800 rounded-lg">
