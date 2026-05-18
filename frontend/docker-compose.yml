@@ -1,0 +1,17 @@
+services:
+  frontend:
+    container_name: startflow-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:8078}
+        PUBLIC_AI_URL: ${PUBLIC_AI_URL:-http://localhost:8077}
+    image: startflow-frontend:latest
+    ports:
+      - "8080:3000"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      ORIGIN: ${ORIGIN:-http://localhost:8080}
+    restart: unless-stopped
