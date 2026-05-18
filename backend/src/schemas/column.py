@@ -1,13 +1,13 @@
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
-from typing import Optional
 
 from .task import TaskRead
 
 
 class ColumnBase(BaseModel):
-    project_id: UUID 
+    project_id: UUID
     name: str = Field(..., max_length=50)
     position: int
 
@@ -21,8 +21,14 @@ class ColumnUpdate(BaseModel):
     name: str | None = Field(None, min_length=1, max_length=50)
 
 
+class ColumnCreateResponse(ColumnBase):
+    id: UUID
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ColumnRead(ColumnBase):
     """Ответ API: без секретов."""
+
     tasks: list[TaskRead] = []
 
     model_config = ConfigDict(from_attributes=True)

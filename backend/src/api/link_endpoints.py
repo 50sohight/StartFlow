@@ -1,32 +1,28 @@
-from fastapi import APIRouter, HTTPException, Cookie, status, Depends
+from fastapi import APIRouter, HTTPException
 from src.database import async_session_maker
 from src.models import LinksOrm, ProjectMembersOrm
+from src.api.dependencies import UserIdDep 
+
 from uuid import UUID
-from src.config import settings
-from src.services.auth import TokenService
 from sqlalchemy import select
-
 import datetime
-
 import secrets
 
 router = APIRouter(prefix="/link", tags=["Ссылки-приглашения"])
 
-async def get_current_user_uuid(access_token: str | None = Cookie(default=None)):
-
-    token_service = TokenService()
-
-    payload = token_service.decode_token(access_token)
-    return UUID(payload["user_id"])
-        
-
 @router.post("/generate_link/{project_uuid}")
-async def genetate_link(project_uuid: UUID, created_by: UUID = Depends(get_current_user_uuid)):
+async def genetate_link(project_uuid: UUID, created_by:  UserIdDep):
     '''
     генерируем ссылку, записываем в links, пока used_by=null ссылка будет считаться неиспользованой
+    сгенерить ссылку может только чел который уже есть в проекте 
     '''
     link = secrets.token_urlsafe(24)
     async with async_session_maker() as session:
+
+        project_member = await session.get(ProjectMembersOrm, {"project_id": project_uuid, "user_id": created_by})
+        if project_member is None:
+            raise HTTPException(status_code=400, detail="вы не являетесь участником проекта")
+        
         new_link = LinksOrm(
             link=link, 
             created_by=created_by, 
@@ -38,7 +34,7 @@ async def genetate_link(project_uuid: UUID, created_by: UUID = Depends(get_curre
     return link
 
 @router.post("/use_link/{user_link}")
-async def use_link(user_link: str, used_by: UUID = Depends(get_current_user_uuid)):
+async def use_link(user_link: str, used_by: UserIdDep):
     '''
     получаем ссылку, ищем ее в links, смотрим была/не была использована, истекла по времени или нет,
     есть она или нет, првоеряем есть участник в проекте до действия ссылки(учатсник уже в проекте)

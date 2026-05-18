@@ -6,15 +6,19 @@
   
   let dropdownOpen = $state(false);
   let mobileMenuOpen = $state(false);
-  
+
+  let avatar = $derived(
+    ($authStore?.fullname.split(' ').map(x => x.at(0)).join('') || '').toUpperCase()
+  );
+
   const toggleDropdown = () => dropdownOpen = !dropdownOpen;
   const closeDropdown = () => dropdownOpen = false;
 
   const toggleMobile = () => mobileMenuOpen = !mobileMenuOpen;
   const closeMobile = () => mobileMenuOpen = false;
-  
-  const handleLogout = () => {
-    authStore.logout();
+
+  const handleLogout = async () => {
+    await authStore.logout();
     dropdownOpen = false;
     window.location.href = '/'; 
   };
@@ -44,23 +48,22 @@
 
       <!-- Правая часть: Кнопки / Профиль -->
       <div class="hidden md:flex items-center space-x-4">
-        {#if $authStore.id}
-          <!-- Кнопка открытия панели профиля -->
+        {#if $authStore}
           <button 
             onclick={toggleDropdown} 
             class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition"
           >
             <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold text-sm">
-              {$authStore.avatar}
+              {avatar}
             </div>
-            <span class="text-gray-700 font-medium">{$authStore.name}</span>
+            <span class="text-gray-700 font-medium">{$authStore.fullname}</span>
             <ChevronDown size="16" class="text-gray-400" />
           </button>
         {:else}
-          <Button variant="secondary" href="/auth">Войти</Button>
-          <Button variant="primary" href="/auth">Регистрация</Button>
-        {/if}
-      </div>
+            <Button variant="secondary" href="/auth/login">Войти</Button>
+            <Button variant="primary" href="/auth/register">Регистрация</Button>
+          {/if}
+        </div>
 
       <!-- Мобильный бургер -->
       <div class="md:hidden flex items-center">
@@ -102,11 +105,11 @@
     <div class="p-4 border-b border-gray-100">
       <div class="flex items-center space-x-3 mb-3">
         <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">
-          {$authStore.avatar}
+          {avatar}
         </div>
         <div>
-          <p class="font-semibold text-gray-900">{$authStore.name}</p>
-          <p class="text-sm text-gray-500 truncate">{$authStore.email}</p>
+          <p class="font-semibold text-gray-900">{$authStore.fullname}</p>
+          <p class="text-sm text-gray-500 truncate">{$authStore.login}</p>
         </div>
       </div>
     </div>
@@ -114,7 +117,7 @@
     <!-- Навигация панели -->
     <nav class="flex-1 p-2">
       <a 
-        href="/dashboard" 
+        href="/projects" 
         onclick={closeDropdown}
         class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition group"
       >
@@ -171,14 +174,14 @@
     <!-- Блок авторизации внизу -->
     <div class="p-4 border-t border-gray-100 mt-auto">
       {#if $authStore.id}
-        <a href="/dashboard" class="block w-full text-center px-4 py-2.5 mb-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium" onclick = {closeMobile}>
-          Дашборд
+        <a href="/projects" class="block w-full text-center px-4 py-2.5 mb-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium" onclick = {closeMobile}>
+          Проекты
         </a>
         <button onclick={handleLogout} class="block w-full text-center px-4 py-2.5 rounded-lg text-red-600 border border-red-200 hover:bg-red-50 font-medium">
           Выйти
         </button>
       {:else}
-        <Button variant="primary" href="/auth" class="w-full">Войти</Button>
+        <Button variant="primary" href="/auth/login" class="w-full">Войти</Button>
       {/if}
     </div>
   </div>
