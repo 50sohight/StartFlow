@@ -1,0 +1,45 @@
+services:
+  db:
+    container_name: startflow-db
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-startflow}
+      POSTGRES_PASSWORD: ${DB_PASS:?Set DB_PASS in .env}
+      POSTGRES_DB: ${DB_NAME:-startflow}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER:-startflow} -d ${DB_NAME:-startflow}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    container_name: startflow-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: startflow-backend:latest
+    ports:
+      - "8078:8000"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-startflow}
+      DB_USER: ${DB_USER:-startflow}
+      DB_PASS: ${DB_PASS:?Set DB_PASS in .env}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Set JWT_SECRET_KEY in .env}
+      JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_SECONDS: ${ACCESS_TOKEN_EXPIRE_SECONDS:-3600}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

@@ -12,6 +12,12 @@ from src.api.api.tasks import router as router_tasks
 
 app = FastAPI()
 
+
+@app.get("/")
+async def root():
+    return {"message": "StartFlow API is running"}
+
+
 app.include_router(router_auth)
 app.include_router(router_links)
 app.include_router(router_users)
