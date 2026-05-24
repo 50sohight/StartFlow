@@ -1,0 +1,44 @@
+# GPU image: llama-cpp-python with CUDA (prebuilt wheel) + NVIDIA Container Toolkit on host.
+ARG CUDA_WHEEL_TAG=cu124
+FROM nvidia/cuda:12.4.1-runtime-ubuntu22.04
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    N_CTX=2048 \
+    MODEL_DIR=/service/models \
+    LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
+
+WORKDIR /service
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 \
+    python3.11-venv \
+    python3-pip \
+    build-essential \
+    cmake \
+    libgomp1 \
+    curl \
+ && ln -sf /usr/bin/python3.11 /usr/bin/python3 \
+ && ln -sf /usr/bin/python3.11 /usr/bin/python \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.docker.txt ./requirements.txt
+
+# Install CUDA-enabled llama-cpp first, then the rest (avoid overwriting with CPU wheel).
+RUN grep -v '^llama-cpp-python' requirements.txt > requirements.no-llama.txt && \
+    pip3 install --upgrade pip && \
+    pip3 install "llama-cpp-python==0.3.16" \
+      --extra-index-url "https://abetlen.github.io/llama-cpp-python/whl/${CUDA_WHEEL_TAG}" && \
+    pip3 install -r requirements.no-llama.txt
+
+COPY app ./app
+RUN mkdir -p /service/models
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD curl --fail http://127.0.0.1:8000/ || exit 1
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

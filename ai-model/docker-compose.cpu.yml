@@ -1,0 +1,28 @@
+# CPU tuning overlay (no GPU). Example:
+#   N_THREADS=8 docker compose -f docker-compose.yml -f docker-compose.cpu.yml up -d --build
+services:
+  ai-model:
+    build:
+      dockerfile: Dockerfile.openblas
+    environment:
+      N_THREADS: "${N_THREADS:-}"
+      N_THREADS_BATCH: "${N_THREADS_BATCH:-}"
+      N_BATCH: "${N_BATCH:-512}"
+      USE_MLOCK: "${USE_MLOCK:-1}"
+      USE_MMAP: "${USE_MMAP:-1}"
+      # Keep BLAS/OpenMP from oversubscribing when N_THREADS is set in .env
+      OMP_NUM_THREADS: "${OMP_NUM_THREADS:-${N_THREADS:-}}"
+      OPENBLAS_NUM_THREADS: "${OPENBLAS_NUM_THREADS:-${N_THREADS:-}}"
+      GGML_NUM_THREADS: "${GGML_NUM_THREADS:-${N_THREADS:-}}"
+    cap_add:
+      - IPC_LOCK
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    # Optional: reserve most of the box for ai-model (adjust to your VPS)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: "8"
+    #       memory: 12G

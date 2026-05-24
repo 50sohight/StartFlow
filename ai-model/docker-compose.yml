@@ -10,6 +10,7 @@ services:
     environment:
       MODEL_DIR: /service/models
       MODEL_FILENAME: ${MODEL_FILENAME:-vikhr-llama3.1-8b-instruct-r-21-09-24-q4_k_m.gguf}
+      # CPU image: 0. For GPU use docker-compose.gpu.yml (default N_GPU_LAYERS=-1 there).
       N_GPU_LAYERS: "${N_GPU_LAYERS:-0}"
       N_CTX: "${N_CTX:-2048}"
       HF_MODEL_URL: ${HF_MODEL_URL:-https://huggingface.co/Neurogen/Vikhr-Llama3.1-8B-Instruct-R-21-09-24-Q4_K_M-GGUF}

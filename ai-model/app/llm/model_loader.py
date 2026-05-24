@@ -4,6 +4,8 @@ from typing import List, Literal
 from llama_cpp import Llama
 from loguru import logger
 
+from .llama_config import llama_init_kwargs
+
 class VikhrRAG:
     # Классовые атрибуты для загрузки модели
     CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -74,14 +76,12 @@ class VikhrRAG:
 
             logger.info(f"Загрузка модели из {cls.MODEL_PATH}...")
 
-            n_gpu_layers = int(os.getenv("N_GPU_LAYERS", "0"))
-            n_ctx = int(os.getenv("N_CTX", "2048"))
+            llama_kwargs = llama_init_kwargs()
+            logger.info(f"llama.cpp init: {llama_kwargs}")
 
             cls._llm_instance = Llama(
                 model_path=cls.MODEL_PATH,
-                n_gpu_layers=n_gpu_layers,
-                n_ctx=n_ctx,  # Контекст
-                verbose=False
+                **llama_kwargs,
             )
             logger.success("Модель успешно загружена")
 
