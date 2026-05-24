@@ -1,4 +1,9 @@
-# GPU overlay: docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+# Local workstation: NVIDIA GPU (e.g. RTX 5060 8GB) + Ryzen tuning
+#
+#   cp .env.local-gpu.example .env   # edit MODEL_HOST_PATH
+#   docker compose -f docker-compose.yml -f docker-compose.local-gpu.yml up -d --build
+#
+# Requires: NVIDIA driver + Docker GPU support (Linux or WSL2 + Docker Desktop)
 services:
   ai-model:
     build:
@@ -6,19 +11,20 @@ services:
       args:
         CUDA_WHEEL_TAG: ${CUDA_WHEEL_TAG:-cu124}
     environment:
-      # -1 = offload all layers; capped by model size (~35 for 8B). Not the same as N_CTX=2048.
       N_GPU_LAYERS: "${N_GPU_LAYERS:--1}"
       N_CTX: "${N_CTX:-2048}"
-      N_THREADS: "${N_THREADS:-}"
-      N_THREADS_BATCH: "${N_THREADS_BATCH:-}"
+      N_THREADS: "${N_THREADS:-6}"
+      N_THREADS_BATCH: "${N_THREADS_BATCH:-12}"
       N_BATCH: "${N_BATCH:-512}"
       USE_MLOCK: "${USE_MLOCK:-0}"
       USE_MMAP: "${USE_MMAP:-1}"
+      OMP_NUM_THREADS: "${OMP_NUM_THREADS:-6}"
+      OPENBLAS_NUM_THREADS: "${OPENBLAS_NUM_THREADS:-6}"
       NVIDIA_VISIBLE_DEVICES: "${NVIDIA_VISIBLE_DEVICES:-all}"
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              count: all
+              count: 1
               capabilities: [gpu]

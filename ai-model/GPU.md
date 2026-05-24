@@ -1,5 +1,7 @@
 # GPU для startflow-ai-model
 
+**Локальная машина (RTX 5060 8GB и т.п.):** см. [LOCAL-GPU.md](./LOCAL-GPU.md) и `.env.local-gpu.example` + `docker-compose.local-gpu.yml`.
+
 ## Почему сейчас медленно
 
 1. `N_GPU_LAYERS=0` — llama.cpp не выгружает слои на GPU.
