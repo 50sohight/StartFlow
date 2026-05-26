@@ -75,7 +75,7 @@ class VikhrRAG:
             logger.info(f"Загрузка модели из {cls.MODEL_PATH}...")
 
             n_gpu_layers = int(os.getenv("N_GPU_LAYERS", "0"))
-            n_ctx = int(os.getenv("N_CTX", "2048"))
+            n_ctx = int(os.getenv("N_CTX", "4096"))
 
             cls._llm_instance = Llama(
                 model_path=cls.MODEL_PATH,
@@ -94,7 +94,7 @@ class VikhrRAG:
             # Параметры генерации для ЭТАПА 2 (финальный ответ)
             temperature: float = 0.3,
             top_k: int = 40,
-            max_tokens: int = 2048,
+            max_tokens: int = 64,
             mode: Literal["rag", "chart"] = "rag"
             ) -> str:
         """

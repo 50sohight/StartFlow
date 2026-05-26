@@ -9,6 +9,28 @@ from ..prompts import description_prompt
 router = APIRouter()
 vikhr = VikhrRAG()
 
+BAD_DESCRIPTION_PHRASES = [
+    "к сожалению",
+    "я не могу",
+    "не могу найти",
+    "нет необходимых данных",
+    "у меня нет данных",
+    "пожалуйста, предоставьте",
+    "если бы у меня были данные",
+    "недостаточно данных для формирования описания проекта",
+]
+
+def is_invalid_description_response(description: str) -> bool:
+    if not description or not description.strip():
+        return True
+
+    normalized_description = " ".join(description.lower().split())
+
+    return any(
+        phrase in normalized_description
+        for phrase in BAD_DESCRIPTION_PHRASES
+    )
+
 @router.post("/generate/description",
              response_model=ModelResponse,
              summary="Генерация текста для раздела с описанием с готовым промптом")
@@ -20,6 +42,12 @@ async def gen_description(request: DescriptionRequest):
     Готовый промпт для генерации описания задается внутри ручки.
     Возвращает сгенерированный текст в поле text_response.
     """
+
+    if not request.documents or not any(doc.strip() for doc in request.documents):
+        return ModelResponse(
+            text_response="Недостаточно данных для формирования описания проекта.",
+            raw_answer=None,
+        )
 
     try:
         description = vikhr.ask_vikhr(
@@ -37,11 +65,11 @@ async def gen_description(request: DescriptionRequest):
             detail="Модель недоступна или не смогла сгенерировать ответ",
         ) from e
 
-    if not description or not description.strip():
-        logger.error("Model returned empty description")
+    if is_invalid_description_response(description):
+        logger.warning(f"Model returned invalid description: {description[:300]}")
         raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Модель вернула пустое описание",
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Модель не смогла сформировать описание проекта по переданным данным",
         )
 
     return ModelResponse(
