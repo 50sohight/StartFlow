@@ -24,4 +24,10 @@ class ModelResponse(BaseModel):
     chart_data: Optional[ChartData] = None
     raw_answer: Optional[str] = None
 
+class DescriptionRequest(BaseModel):
+    documents: List[str] = []
+    temperature: float = 0.3
+    top_k: int = 40
+    max_tokens: int = 2048
+
 
