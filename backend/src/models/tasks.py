@@ -17,6 +17,7 @@ class TasksOrm(Base):
     title: Mapped[str] = mapped_column(VARCHAR(255))
     description: Mapped[str]
     deadline: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
+    done_at: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
     updated_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
 

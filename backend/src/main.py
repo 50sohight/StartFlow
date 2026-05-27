@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from src.api.api.charts import router as router_charts
 from src.api.api.columns import router as router_columns
 from src.api.api.project_members import router as router_memebers
 from src.api.api.projects import router as router_projects
@@ -20,6 +21,7 @@ async def root():
 
 app.include_router(router_auth)
 app.include_router(router_links)
+app.include_router(router_charts)
 app.include_router(router_users)
 app.include_router(router_columns)
 app.include_router(router_memebers)
