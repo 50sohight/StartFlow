@@ -4,7 +4,6 @@ from fastapi import APIRouter, HTTPException, status
 from ..llm.model_loader import VikhrRAG
 from ..schemas.request import DescriptionRequest, ModelResponse
 from ..prompts import report_prompt
-from gen_description import is_invalid_response
 
 # Инициализация
 router = APIRouter()
@@ -24,7 +23,7 @@ async def gen_report(request: DescriptionRequest):
 
     if not request.documents or not any(doc.strip() for doc in request.documents):
         return ModelResponse(
-            text_response="Недостаточно данных для формирования описания проекта.",
+            text_response="Недостаточно данных для формирования отчета по проекту.",
             raw_answer=None,
         )
 
@@ -38,18 +37,12 @@ async def gen_report(request: DescriptionRequest):
             mode="rag"
         )
     except Exception as e:
-        logger.exception("Description generation failed")
+        logger.exception("Report generation failed")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Модель недоступна или не смогла сгенерировать ответ",
         ) from e
 
-    if is_invalid_response(report):
-        logger.warning(f"Model returned invalid report: {report[:300]}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Модель не смогла сформировать отчет проекта по переданным данным",
-        )
 
     return ModelResponse(
         text_response=report,

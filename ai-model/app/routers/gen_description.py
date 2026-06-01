@@ -9,27 +9,6 @@ from ..prompts import description_prompt
 router = APIRouter()
 vikhr = VikhrRAG()
 
-BAD_DESCRIPTION_PHRASES = [
-    "к сожалению",
-    "я не могу",
-    "не могу найти",
-    "нет необходимых данных",
-    "у меня нет данных",
-    "пожалуйста, предоставьте",
-    "если бы у меня были данные",
-    "недостаточно данных для формирования описания проекта",
-]
-
-def is_invalid_response(description: str) -> bool:
-    if not description or not description.strip():
-        return True
-
-    normalized_description = " ".join(description.lower().split())
-
-    return any(
-        phrase in normalized_description
-        for phrase in BAD_DESCRIPTION_PHRASES
-    )
 
 @router.post("/generate/description",
              response_model=ModelResponse,
