@@ -2,7 +2,7 @@ from loguru import logger
 from fastapi import APIRouter, HTTPException, status
 
 from ..llm.model_loader import VikhrRAG
-from ..schemas.request import DescriptionRequest, ModelResponse
+from ..schemas.request import ReportRequest, ModelResponse
 from ..prompts import report_prompt
 
 # Инициализация
@@ -12,7 +12,7 @@ vikhr = VikhrRAG()
 @router.post("/generate/report",
              response_model=ModelResponse,
              summary="Генерация отчета за период для раздела с отчетами")
-async def gen_report(request: DescriptionRequest):
+async def gen_report(request: ReportRequest):
     """
     Эндпоинт для генерации отчета по проекту за период.
 

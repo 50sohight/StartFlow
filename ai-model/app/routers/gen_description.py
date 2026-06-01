@@ -2,7 +2,7 @@ from loguru import logger
 from fastapi import APIRouter, HTTPException, status
 
 from ..llm.model_loader import VikhrRAG
-from ..schemas.request import ReportRequest, ModelResponse
+from ..schemas.request import DescriptionRequest, ModelResponse
 from ..prompts import description_prompt
 
 # Инициализация
@@ -13,7 +13,7 @@ vikhr = VikhrRAG()
 @router.post("/generate/description",
              response_model=ModelResponse,
              summary="Генерация текста для раздела с описанием с готовым промптом")
-async def gen_description(request: ReportRequest):
+async def gen_description(request: DescriptionRequest):
     """
     Эндпоинт для генерации описания проекта.
 
