@@ -2,7 +2,7 @@ from loguru import logger
 from fastapi import APIRouter, HTTPException, status
 
 from ..llm.model_loader import VikhrRAG
-from ..schemas.request import DescriptionRequest, ModelResponse
+from ..schemas.request import ReportRequest, ModelResponse
 from ..prompts import description_prompt
 
 # Инициализация
@@ -13,7 +13,7 @@ vikhr = VikhrRAG()
 @router.post("/generate/description",
              response_model=ModelResponse,
              summary="Генерация текста для раздела с описанием с готовым промптом")
-async def gen_description(request: DescriptionRequest):
+async def gen_description(request: ReportRequest):
     """
     Эндпоинт для генерации описания проекта.
 
@@ -43,13 +43,6 @@ async def gen_description(request: DescriptionRequest):
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Модель недоступна или не смогла сгенерировать ответ",
         ) from e
-
-    if is_invalid_response(description):
-        logger.warning(f"Model returned invalid description: {description[:300]}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Модель не смогла сформировать описание проекта по переданным данным",
-        )
 
     return ModelResponse(
         text_response=description,
