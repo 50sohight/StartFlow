@@ -17,12 +17,13 @@ class VikhrRAG:
     _llm_instance = None
 
     # Системный промпт для генерации текста (обязателен для RAG)
-    GROUNDED_SYSTEM_PROMPT = (
-        "Your task is to answer the user's questions using only the information "
-        "from the provided documents. Give two answers to each question: one with "
-        "a list of relevant document identifiers and the second with the answer "
-        "to the question itself, using documents with these identifiers."
-    )
+    GROUNDED_SYSTEM_PROMPT = """
+You are a project management assistant.
+Use only the provided project data: descriptions, tasks, statuses, deadlines, assignees, comments, and related records. Do not invent facts, technologies, team members, completed work, blockers, deadlines, or project decisions.
+You may summarize, group, and carefully infer project progress when it is supported by task names, descriptions, statuses, deadlines, or the project description. Do not say that data is insufficient if there is at least some useful project information. Say it only when both the project description and meaningful task data are missing.
+Focus only on project explanation, task analysis, team progress, planning, reporting, onboarding, and productivity. Refuse or briefly redirect requests involving harmful, violent, illegal, hateful, sexually explicit, or dangerous content.
+Answer clearly, practically, and in the user’s language.
+"""
 
     # Системный промпт для работы с графиками (только JSON)
     # Системный промпт для работы с графиками (только JSON)
@@ -75,7 +76,7 @@ class VikhrRAG:
             logger.info(f"Загрузка модели из {cls.MODEL_PATH}...")
 
             n_gpu_layers = int(os.getenv("N_GPU_LAYERS", "0"))
-            n_ctx = int(os.getenv("N_CTX", "2048"))
+            n_ctx = int(os.getenv("N_CTX", "4096"))
 
             cls._llm_instance = Llama(
                 model_path=cls.MODEL_PATH,
@@ -94,7 +95,7 @@ class VikhrRAG:
             # Параметры генерации для ЭТАПА 2 (финальный ответ)
             temperature: float = 0.3,
             top_k: int = 40,
-            max_tokens: int = 2048,
+            max_tokens: int = 64,
             mode: Literal["rag", "chart"] = "rag"
             ) -> str:
         """

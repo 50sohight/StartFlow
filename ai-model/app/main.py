@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
-from .routers import generate
+from .routers import generate, gen_description, gen_report
 
 
 @asynccontextmanager
@@ -41,7 +41,8 @@ app.add_middleware(
 )
 
 app.include_router(generate.router, prefix="/ai", tags=["AI Model"])
-
+app.include_router(gen_description.router, prefix="/ai", tags=["AI Model"])
+app.include_router(gen_report.router, prefix="/ai", tags=["AI Model"])
 
 @app.get("/")
 async def root():
