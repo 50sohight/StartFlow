@@ -20,7 +20,7 @@ BAD_DESCRIPTION_PHRASES = [
     "недостаточно данных для формирования описания проекта",
 ]
 
-def is_invalid_description_response(description: str) -> bool:
+def is_invalid_response(description: str) -> bool:
     if not description or not description.strip():
         return True
 
@@ -65,7 +65,7 @@ async def gen_description(request: DescriptionRequest):
             detail="Модель недоступна или не смогла сгенерировать ответ",
         ) from e
 
-    if is_invalid_description_response(description):
+    if is_invalid_response(description):
         logger.warning(f"Model returned invalid description: {description[:300]}")
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

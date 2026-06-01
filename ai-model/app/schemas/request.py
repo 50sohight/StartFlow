@@ -26,8 +26,12 @@ class ModelResponse(BaseModel):
 
 class DescriptionRequest(BaseModel):
     documents: List[str] = []
-    temperature: float = 0.3
+    temperature: float = 0.4
     top_k: int = 40
     max_tokens: int = 2048
 
-
+class ReportRequest(BaseModel):
+    documents: List[str] = []
+    temperature: float = 0.3
+    top_k: int = 40
+    max_tokens: int = 2048
