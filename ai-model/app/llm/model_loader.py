@@ -11,7 +11,7 @@ class VikhrRAG:
     MODEL_DIR = os.getenv("MODEL_DIR", DEFAULT_MODEL_DIR)
     MODEL_FILENAME = os.getenv(
         "MODEL_FILENAME",
-        "vikhr-llama3.1-8b-instruct-r-21-09-24-q4_k_m.gguf"
+        "vikhr-llama3.1-8b-instruct-r-21-09-24.Q3_K_M.gguf"
     )
     MODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILENAME)
     _llm_instance = None

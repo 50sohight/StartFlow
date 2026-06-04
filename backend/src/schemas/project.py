@@ -32,18 +32,24 @@ class ProjectRead(ProjectBase):
     created_at: datetime
     updated_at: datetime
     
-    columns: List["ColumnRead"] = []
+    columns: list["ColumnRead"] | None = None
     tasks: List["TaskRead"] = []
+    members: list["ProjectMemberRead"] | None = None
     
-    # ИСПРАВЛЕНИЕ: меняем List["User"] на List["ProjectMemberRead"]
-    # Так как ProjectsOrm.members возвращает список участников проекта (с ролями), а не просто юзеров
-    members: List["ProjectMemberRead"] = []
-
     model_config = ConfigDict(from_attributes=True)
 
 
 class ProjectInDB(ProjectRead):
     pass
 
-# Нужно добавить обновление forward references, если используешь старые версии Pydantic/Python, 
-# но в современных версиях это работает автоматом.
+class ProjectForDescription(BaseModel):
+    """Схема только для генерации описания — без columns и members"""
+    #Влад, эта схема и должна быть вместо List[str]
+    name: str
+    description: str | None = None
+    status: Literal['активный', 'архивный']
+    created_at: datetime
+    updated_at: datetime
+    tasks: List["TaskRead"] = []   
+
+    model_config = ConfigDict(from_attributes=True)
