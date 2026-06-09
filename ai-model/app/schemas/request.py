@@ -25,20 +25,6 @@ class ModelResponse(BaseModel):
     chart_data: Optional[ChartData] = None
     raw_answer: Optional[str] = None
 
-class DescriptionRequest(BaseModel):
-    """Схема для генерации описания"""
-    documents: InfoForGenerate
-    temperature: float = 0.4
-    top_k: int = 40
-    max_tokens: int = 2048
-
-class ReportRequest(BaseModel):
-    """Схема для генерации отчетов"""
-    documents: InfoForGenerate
-    temperature: float = 0.3
-    top_k: int = 40
-    max_tokens: int = 2048
-
 class InfoForGenerate(BaseModel):
     """Схема для сбора информации проекта без columns и members для генерации"""
     name: str
@@ -65,6 +51,22 @@ class TaskRead(TaskBase):
 
     # Это важно: позволяет Pydantic читать данные прямо из объектов SQLAlchemy
     model_config = ConfigDict(from_attributes=True)
+
+class DescriptionRequest(BaseModel):
+    """Схема для генерации описания"""
+    documents: InfoForGenerate
+    temperature: float = 0.4
+    top_k: int = 40
+    max_tokens: int = 2048
+
+class ReportRequest(BaseModel):
+    """Схема для генерации отчетов"""
+    documents: InfoForGenerate
+    temperature: float = 0.3
+    top_k: int = 40
+    max_tokens: int = 2048
+
+
 
 
 
