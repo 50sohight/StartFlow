@@ -43,7 +43,6 @@
       <div class="hidden md:flex items-center space-x-8">
         <a href="/#features" class="text-gray-600 hover:text-gray-900 transition">Возможности</a>
         <a href="/#templates" class="text-gray-600 hover:text-gray-900 transition">Шаблоны</a>
-        <a href="#" class="text-gray-600 hover:text-gray-900 transition">Цены</a>
       </div>
 
       <!-- Правая часть: Кнопки / Профиль -->
@@ -168,7 +167,6 @@
     <div class="flex-1 p-4 space-y-2">
       <a href="/#features" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium" onclick = {closeMobile}>Возможности</a>
       <a href="/#templates" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium" onclick = {closeMobile}>Шаблоны</a>
-      <a href="#" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium" onclick = {closeMobile}>Цены</a>
     </div>
 
     <!-- Блок авторизации внизу -->

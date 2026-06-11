@@ -134,39 +134,40 @@ Answer clearly, practically, and in the user’s language.
                 logger.exception(f"Chart generation failed: {e}")
                 raise
 
+
+
         else:
-            messages_step1 = [
+            documents_json = json.dumps(documents, ensure_ascii=False, indent=2)
+            messages = [
+
                 {"role": "system", "content": self.systemprompt},
-                {"role": "documents", "content": json.dumps(documents, ensure_ascii=False)},
-                {"role": "user", "content": user_query}
+                {
+                    "role": "user",
+                    "content": (
+                        "Данные проекта переданы ниже в формате JSON.\n"
+                        "Используй только эти данные. Не пиши, что данных нет, "
+                        "если в JSON есть описание проекта или задачи.\n\n"
+                        f"{documents_json}\n\n"
+                        f"{user_query}"
+
+                    )
+                }
             ]
 
-            # ЭТАП 1: Поиск документов
             try:
-                output_step1 = llm.create_chat_completion(
-                    messages=messages_step1,
-                    temperature=0.0,
-                    max_tokens=256
-                )
-                relevant_indexes = output_step1['choices'][0]['message']['content']
-            except Exception as e:
-                logger.exception("RAG Step 1 failed")
-                raise
-
-            messages_step2 = messages_step1 + [
-                {"role": "assistant", "content": relevant_indexes}
-            ]
-
-            # ЭТАП 2: Генерация ответа (как было)
-            try:
-                output_step2 = llm.create_chat_completion(
-                    messages=messages_step2,
+                output = llm.create_chat_completion(
+                    messages=messages,
                     temperature=temperature,
                     top_k=top_k,
                     max_tokens=max_tokens
                 )
-                final_answer = output_step2['choices'][0]['message']['content']
+
+                final_answer = output["choices"][0]["message"]["content"]
+
                 return final_answer
+
             except Exception as e:
-                logger.error(f"RAG Step 2 error: {e}")
+
+                logger.exception(f"RAG generation error: {e}")
+
                 return "Ошибка при генерации ответа."

@@ -73,7 +73,7 @@ async def create_project(payload: ProjectCreate, session: SessionDep, created_by
     member = ProjectMembersOrm(
         project_id=project.id,
         user_id=created_by,
-        role="creator"
+        role="admin"
     )
     session.add(member)
     await session.commit()

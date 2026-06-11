@@ -1,7 +1,8 @@
 // src/lib/stores/authStore.js
 import { writable } from 'svelte/store';
 
-const BASE_URL = 'http://localhost:8000/auth';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const BASE_URL = `${API_BASE_URL}/auth`;
 
 function createAuthStore() {
   const { subscribe, set } = writable(null);
