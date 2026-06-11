@@ -26,7 +26,7 @@ async def get_description(project:ProjectForDescription):
     timeout = httpx.Timeout(600.0, read=600.0)
     async with httpx.AsyncClient(timeout=timeout) as client:
         response = await client.post(
-            'http://204.12.253.210:8077/ai/generate/description', 
+            'http://100.70.76.81:8077/ai/generate/description', 
             json=payload.model_dump(mode='json'))
         return response.json()
 
