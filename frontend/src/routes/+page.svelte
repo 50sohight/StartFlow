@@ -4,7 +4,7 @@
   import { authStore } from '$lib/stores/authStore';   // 🆕
 
   let ctaHref = $derived($authStore ? '/project_hub' : '/auth/register');
-  let ctaText = $derived($authStore ? 'Перейти в проекты' : 'Начать бесплатно');
+  let ctaText = $derived($authStore ? 'Перейти в проекты' : 'Начать');
 </script>
 
 <!-- Hero Section -->
@@ -26,7 +26,6 @@
           <Button variant="primary" href={ctaHref}>
             {ctaText} <ArrowRight size="18" class="ml-2" />
           </Button>
-          <Button variant="secondary">Смотреть демо</Button>
         </div>
       </div>
       

@@ -43,7 +43,6 @@
       <div class="hidden md:flex items-center space-x-8">
         <a href="/#features" class="text-gray-600 hover:text-gray-900 transition">Возможности</a>
         <a href="/#templates" class="text-gray-600 hover:text-gray-900 transition">Шаблоны</a>
-        <a href="#" class="text-gray-600 hover:text-gray-900 transition">Цены</a>
       </div>
 
       <!-- Правая часть: Кнопки / Профиль -->
