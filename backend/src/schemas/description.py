@@ -4,6 +4,6 @@ from .project import ProjectForDescription
 
 class ML_request(BaseModel):
     documents:ProjectForDescription
-    temperature: int
+    temperature: float
     top_k: int
     max_tokens: int

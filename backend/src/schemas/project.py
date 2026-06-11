@@ -1,12 +1,11 @@
 from uuid import UUID
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_serializer
 from typing import Literal
 
 from .column import ColumnRead
 from .task import TaskRead
-# Импортируем правильную схему для участника
 from .project_member import ProjectMemberRead 
 from .users import User
 
@@ -32,9 +31,9 @@ class ProjectRead(ProjectBase):
     created_at: datetime
     updated_at: datetime
     
-    columns: list["ColumnRead"] | None = None
-    tasks: List["TaskRead"] = []
-    members: list["ProjectMemberRead"] | None = None
+    columns: list[ColumnRead] | None = None
+    tasks: List[TaskRead] = []
+    members: list[ProjectMemberRead] | None = None
     
     model_config = ConfigDict(from_attributes=True)
 
@@ -44,12 +43,20 @@ class ProjectInDB(ProjectRead):
 
 class ProjectForDescription(BaseModel):
     """Схема только для генерации описания — без columns и members"""
-    #Влад, эта схема и должна быть вместо List[str]
+    id: UUID
     name: str
     description: str | None = None
     status: Literal['активный', 'архивный']
     created_at: datetime
     updated_at: datetime
-    tasks: List["TaskRead"] = []   
+    tasks: List["TaskRead"] = []
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_serializer('created_at', 'updated_at')
+    def serialize_datetime(self, dt: datetime) -> str:
+        if dt.tzinfo is not None:
+            dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+        return dt.isoformat(timespec='milliseconds') + 'Z'
+
+ProjectRead.model_rebuild()

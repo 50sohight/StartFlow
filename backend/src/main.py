@@ -10,10 +10,22 @@ from src.api.api.description import router as router_description
 from src.api.auth import router as router_auth
 from src.api.link_endpoints import router as router_links
 
+from fastapi.middleware.cors import CORSMiddleware
+
+
+
 
 # app = FastAPI(openapi_prefix="/api")
 app = FastAPI()
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://204.12.253.210:8080", "http://204.12.253.210:8078"],  
+    allow_credentials=True,           
+    allow_methods=["*"],              
+    allow_headers=["*"],             
+)
 
 @app.get("/")
 async def root():

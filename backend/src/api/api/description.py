@@ -6,7 +6,7 @@ import httpx
 
 from sqlalchemy.orm import selectinload  
 from src.database import async_session_maker
-from src.models import ColumnsOrm, ProjectMembersOrm, ProjectsOrm
+from src.models import ProjectMembersOrm, ProjectsOrm
 from src.schemas.project import ProjectForDescription
 from src.schemas.description import ML_request
 from src.api.dependencies import UserIdDep 
@@ -17,24 +17,17 @@ router = APIRouter(prefix="/description", tags=["Описание проекта
 
 
 async def get_description(project:ProjectForDescription):
-    #вместо словаря в payload будет ML_request, когда вместо списка строк в documents будет передаваться
-    #ProjectForDescription
-    payload = {
-        "documents": [
-          project.description,
-          project.name,
-          project.status,
-          str(project.updated_at),
-          str(project.created_at),
-          project.description
-        ],
-        "temperature": 0.4,
-        "top_k": 40,
-        "max_tokens": 2048
-    }
+    payload = ML_request(
+        documents= project,
+        temperature= 0.4,
+        top_k= 40,
+        max_tokens= 2048
+    )
     timeout = httpx.Timeout(600.0, read=600.0)
     async with httpx.AsyncClient(timeout=timeout) as client:
-        response = await client.post('http://204.12.253.210:8077/ai/generate/description', json=payload)
+        response = await client.post(
+            'http://204.12.253.210:8077/ai/generate/description', 
+            json=payload.model_dump(mode='json'))
         return response.json()
 
 
@@ -60,7 +53,7 @@ async def get_project_info(project_id: UUID, user_id: UserIdDep):
 
 
 
-@router.get("/{project_id}")
+@router.post("/{project_id}")
 async def get_project_description(project_id: UUID, user_id: UserIdDep):
     project = await get_project_info(project_id=project_id, user_id=user_id)
     project_schema = ProjectForDescription.model_validate(project)
