@@ -39,8 +39,8 @@ async def register(
         "access_token",
         access_token,
         httponly=True,
-        secure=True,
-        samesite="lax",
+        secure=settings.COOKIE_SECURE,
+        samesite=settings.COOKIE_SAMESITE,
         max_age=settings.ACCESS_TOKEN_EXPIRE_SECONDS
     )
 

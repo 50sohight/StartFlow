@@ -4,6 +4,10 @@ import { writable } from 'svelte/store';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const BASE_URL = `${API_BASE_URL}/auth`;
 
+console.log('VITE_API_BASE_URL =', import.meta.env.VITE_API_BASE_URL);
+console.log('API_BASE_URL =', API_BASE_URL);
+console.log('AUTH BASE_URL =', BASE_URL);
+
 function createAuthStore() {
   const { subscribe, set } = writable(null);
 
