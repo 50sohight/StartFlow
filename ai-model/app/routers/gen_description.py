@@ -22,16 +22,26 @@ async def gen_description(request: DescriptionRequest):
     Возвращает сгенерированный текст в поле text_response.
     """
 
-    if not request.documents or not any(doc.strip() for doc in request.documents):
+    project_data = request.documents
+
+    has_description = bool(
+        project_data.description and project_data.description.strip()
+    )
+
+    has_tasks = bool(project_data.tasks)
+
+    if not has_description and not has_tasks:
         return ModelResponse(
             text_response="Недостаточно данных для формирования описания проекта.",
             raw_answer=None,
         )
 
+    documents_payload = project_data.model_dump(mode="json")
+
     try:
         description = vikhr.ask_vikhr(
             user_query=description_prompt(),
-            documents=request.documents,
+            documents=documents_payload,
             temperature=request.temperature,
             top_k=request.top_k,
             max_tokens=request.max_tokens,
@@ -46,5 +56,4 @@ async def gen_description(request: DescriptionRequest):
 
     return ModelResponse(
         text_response=description,
-        raw_answer=description,
     )
