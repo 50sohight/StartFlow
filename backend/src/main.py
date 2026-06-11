@@ -2,18 +2,13 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.api.columns import router as router_columns
+from src.api.api.description import router as router_description
 from src.api.api.project_members import router as router_memebers
 from src.api.api.projects import router as router_projects
 from src.api.api.tasks import router as router_tasks
 from src.api.api.users import router as router_users
-from src.api.api.description import router as router_description
 from src.api.auth import router as router_auth
 from src.api.link_endpoints import router as router_links
-
-from fastapi.middleware.cors import CORSMiddleware
-
-
-
 
 # app = FastAPI(openapi_prefix="/api")
 app = FastAPI()
@@ -21,11 +16,13 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://204.12.253.210:8080", "http://204.12.253.210:8078"],  
-    allow_credentials=True,           
-    allow_methods=["*"],              
-    allow_headers=["*"],             
+    # allow_origins=["http://204.12.253.210:8080", "http://204.12.253.210:8078"],
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 
 @app.get("/")
 async def root():
@@ -40,7 +37,6 @@ app.include_router(router_columns)
 app.include_router(router_memebers)
 app.include_router(router_projects)
 app.include_router(router_tasks)
-
 
 
 if __name__ == "__main__":

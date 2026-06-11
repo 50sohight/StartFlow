@@ -16,7 +16,7 @@
   let showSuccess = $state(false);
   let inviteCode = $state('');
 
-  const API_BASE = 'http://localhost:8000';
+  const API_BASE = 'http://localhost:8080';
 
   onMount(async () => {
     await authStore.fetchUser();
