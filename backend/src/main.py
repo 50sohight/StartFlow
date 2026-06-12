@@ -6,6 +6,7 @@ from src.api.api.columns import router as router_columns
 from src.api.api.description import router as router_description
 from src.api.api.project_members import router as router_memebers
 from src.api.api.projects import router as router_projects
+from src.api.api.task_assignees import router as task_assignees_router
 from src.api.api.tasks import router as router_tasks
 from src.api.api.users import router as router_users
 from src.api.auth import router as router_auth
@@ -39,6 +40,7 @@ app.include_router(router_links)
 app.include_router(router_description)
 app.include_router(router_users)
 app.include_router(router_columns)
+app.include_router(task_assignees_router)
 app.include_router(router_memebers)
 app.include_router(router_projects)
 app.include_router(router_tasks)
