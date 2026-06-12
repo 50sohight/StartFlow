@@ -6,7 +6,7 @@
   import type { Column, Task } from '$lib/data/templates';
 
   let projectId = page.params.project_id;    // derived from rune, no $ needed
-  const BASE_URL = "http://localhost:8080";
+  const BASE_URL = 'http://localhost:8078';
 
   let columns = $state<Column[]>([]);
   let initialColumns = $state<Column[]>([]);

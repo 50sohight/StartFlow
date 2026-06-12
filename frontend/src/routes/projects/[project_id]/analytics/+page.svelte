@@ -18,7 +18,7 @@
 
   let projectId = $derived($page.params.project_id);
 
-  const API_BASE = 'http://localhost:8080';   
+  const API_BASE = 'http://localhost:8078';
 
   // ----- состояние -----
   let projectName = $state('');

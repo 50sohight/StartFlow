@@ -8,7 +8,7 @@
   let message = $state('');
   let messageType = $state(''); // 'success' | 'error'
 
-  const API_BASE = `http://localhost:8080`
+  const API_BASE = 'http://localhost:8078';
 
   onMount(async () => {
     await authStore.fetchUser();
