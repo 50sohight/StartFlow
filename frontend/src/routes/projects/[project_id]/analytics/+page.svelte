@@ -110,7 +110,7 @@
     chartLoading = true;
     chartError = '';
     try {
-      const res = await fetch(`${API_BASE}/ai/chart/${projectId}`, {
+      const res = await fetch(`${API_BASE}/chart/${projectId}`, {
         method: 'POST',
         credentials: 'include'
       });
@@ -237,32 +237,57 @@
             <div class="prose max-w-none text-gray-700 whitespace-pre-wrap">{report}</div>
           {/if}
 
-        {:else if activeTab === 'charts'}
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">Графики проекта</h2>
-          {#if !chartDataConfig && !chartLoading}
-            <p class="text-gray-500 mb-4">График ещё не сгенерирован.</p>
-            <button
-              onclick={generateChart}
-              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-            >
-              Сгенерировать график
-            </button>
-          {:else if chartLoading}
-            <p class="text-gray-500">Генерация графика...</p>
-          {:else if chartError}
-            <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">{chartError}</div>
-            <button
-              onclick={generateChart}
-              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-            >
-              Попробовать снова
-            </button>
-          {:else}
-            <div class="w-full max-w-lg mx-auto">
-              <Bar data={chartDataConfig} options={{ responsive: true }} />
-            </div>
-          {/if}
-        {/if}
+                  {:else if activeTab === 'charts'}
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Графики проекта</h2>
+                    {#if !chartDataConfig && !chartLoading}
+                      <p class="text-gray-500 mb-4">График ещё не сгенерирован.</p>
+                      <div class="flex gap-2">
+                        <button
+                          onclick={generateChart}
+                          class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                        >
+                          Сгенерировать график (AI)
+                        </button>
+                        <button
+                          onclick={() => {
+                            chartDataConfig = {
+                              labels: ['Backlog', 'In Progress', 'Done'],
+                              datasets: [{
+                                label: 'Тестовые данные',
+                                data: [5, 3, 2],
+                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1
+                              }]
+                            };
+                          }}
+                          class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
+                        >
+                          Тестовый график
+                        </button>
+                      </div>
+                    {:else if chartLoading}
+                      <p class="text-gray-500">Генерация графика...</p>
+                    {:else if chartError}
+                      <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">{chartError}</div>
+                      <button
+                        onclick={generateChart}
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                      >
+                        Попробовать снова
+                      </button>
+                    {:else}
+                      <div class="w-full max-w-lg mx-auto">
+                        <Bar data={chartDataConfig} options={{ responsive: true }} />
+                      </div>
+                      <button
+                        onclick={() => chartDataConfig = null}
+                        class="mt-4 text-sm text-gray-500 hover:text-gray-700"
+                      >
+                        Скрыть график
+                      </button>
+                    {/if}
+                  {/if}
       </div>
     {/if}
   </div>
