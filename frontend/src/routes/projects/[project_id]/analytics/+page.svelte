@@ -108,7 +108,7 @@
     reportLoading = true;
     reportError = '';
     try {
-      const res = await fetch(`${API_BASE}/report/${projectId}`, {
+      const res = await fetch(`${API_BASE}/statement/${projectId}`, {
         method: 'POST',
         credentials: 'include'
       });
