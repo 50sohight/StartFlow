@@ -30,11 +30,11 @@ class ProjectRead(ProjectBase):
     id: UUID
     created_at: datetime
     updated_at: datetime
-    
+
     columns: list[ColumnRead] | None = None
     tasks: List[TaskRead] = []
     members: list[ProjectMemberRead] | None = None
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
