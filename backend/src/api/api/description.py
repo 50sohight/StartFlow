@@ -18,15 +18,15 @@ router = APIRouter(prefix="/description", tags=["Описание проекта
 
 async def get_description(project:ProjectForDescription):
     payload = ML_request(
-        documents= project,
-        temperature= 0.4,
-        top_k= 40,
-        max_tokens= 2048
+        documents=project,
+        temperature=0.4,
+        top_k=40,
+        max_tokens=2048
     )
     timeout = httpx.Timeout(600.0, read=600.0)
     async with httpx.AsyncClient(timeout=timeout) as client:
         response = await client.post(
-            f'{settings.PUBLIC_AI_URL}/ai/generate/description', 
+            f'{settings.PUBLIC_AI_URL}/ai/generate/description',
             json=payload.model_dump(mode='json'))
         return response.json()
 
