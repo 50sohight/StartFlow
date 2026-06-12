@@ -169,19 +169,19 @@
       <div class="flex space-x-2 mb-8">
         <button
           onclick={() => activeTab = 'description'}
-          class="px-4 py-2 rounded-lg font-medium transition {activeTab === 'description' ? 'bg-indigo-100 text-indigo-700' : 'bg-white text-gray-600 hover:bg-gray-50'}"
+          class="px-4 py-2 rounded-lg font-medium transition {activeTab === 'description' ? 'bg-green-100 text-green-700' : 'bg-white text-gray-600 hover:bg-gray-50'}"
         >
           Описание
         </button>
         <button
           onclick={() => activeTab = 'report'}
-          class="px-4 py-2 rounded-lg font-medium transition {activeTab === 'report' ? 'bg-indigo-100 text-indigo-700' : 'bg-white text-gray-600 hover:bg-gray-50'}"
+          class="px-4 py-2 rounded-lg font-medium transition {activeTab === 'report' ? 'bg-green-100 text-green-700' : 'bg-white text-gray-600 hover:bg-gray-50'}"
         >
           Отчёт
         </button>
         <button
           onclick={() => activeTab = 'charts'}
-          class="px-4 py-2 rounded-lg font-medium transition {activeTab === 'charts' ? 'bg-indigo-100 text-indigo-700' : 'bg-white text-gray-600 hover:bg-gray-50'}"
+          class="px-4 py-2 rounded-lg font-medium transition {activeTab === 'charts' ? 'bg-green-100 text-green-700' : 'bg-white text-gray-600 hover:bg-gray-50'}"
         >
           Графики
         </button>
@@ -195,7 +195,7 @@
             <p class="text-gray-500 mb-4">Описание ещё не сгенерировано.</p>
             <button
               onclick={generateDescription}
-              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
               Сгенерировать описание
             </button>
@@ -205,7 +205,7 @@
             <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">{descriptionError}</div>
             <button
               onclick={generateDescription}
-              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
               Попробовать снова
             </button>
@@ -219,7 +219,7 @@
             <p class="text-gray-500 mb-4">Отчёт ещё не сгенерирован.</p>
             <button
               onclick={generateReport}
-              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
               Сгенерировать отчёт
             </button>
@@ -229,7 +229,7 @@
             <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">{reportError}</div>
             <button
               onclick={generateReport}
-              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
               Попробовать снова
             </button>
@@ -244,7 +244,7 @@
                       <div class="flex gap-2">
                         <button
                           onclick={generateChart}
-                          class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                         >
                           Сгенерировать график (AI)
                         </button>
@@ -272,7 +272,7 @@
                       <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">{chartError}</div>
                       <button
                         onclick={generateChart}
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                       >
                         Попробовать снова
                       </button>
