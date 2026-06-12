@@ -8,13 +8,28 @@
     Chart as ChartJS,
     CategoryScale,
     LinearScale,
+    BarController,
+    LineController,
     BarElement,
+    LineElement,
+    PointElement,
     Title,
     Tooltip,
     Legend
   } from 'chart.js';
 
-  ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarController,
+    LineController,
+    BarElement,
+    LineElement,
+    PointElement,
+    Title,
+    Tooltip,
+    Legend
+  );
 
   let projectId = $derived($page.params.project_id);
 
@@ -35,9 +50,14 @@
   let reportLoading = $state(false);
   let reportError = $state('');
 
-  let chartDataConfig = $state(null);
-  let chartLoading = $state(false);
-  let chartError = $state('');
+  // ----- состояния для графиков -----
+  let burndownConfig = $state(null);
+  let burndownLoading = $state(false);
+  let burndownError = $state('');
+
+  let teamLoadConfig = $state(null);
+  let teamLoadLoading = $state(false);
+  let teamLoadError = $state('');
 
   // ----- загрузка базовой информации о проекте -----
   onMount(async () => {
@@ -105,42 +125,124 @@
     }
   }
 
-  // ----- генерация графика -----
-  async function generateChart() {
-    chartLoading = true;
-    chartError = '';
+  // ----- загрузка Burndown -----
+  async function loadBurndown() {
+    burndownLoading = true;
+    burndownError = '';
     try {
-      const res = await fetch(`${API_BASE}/chart/${projectId}`, {
-        method: 'POST',
-        credentials: 'include'
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || 'Ошибка генерации графика');
-      }
-      const data = await res.json();
-      // data.chart_data = { labels, values, title, chart_type }
-      if (data.chart_data) {
-        const cd = data.chart_data;
-        chartDataConfig = {
-          labels: cd.labels,
-          datasets: [{
-            label: cd.title,
-            data: cd.values,
+      const [ideal, actual] = await Promise.all([
+        fetch(`${API_BASE}/charts/burndown/${projectId}/ideal`, { credentials: 'include' }).then(r => {
+          if (!r.ok) throw new Error(`Ideal: ${r.status}`);
+          return r.json();
+        }),
+        fetch(`${API_BASE}/charts/burndown/${projectId}/actual`, { credentials: 'include' }).then(r => {
+          if (!r.ok) throw new Error(`Actual: ${r.status}`);
+          return r.json();
+        })
+      ]);
+
+      // Собираем все даты, сортируем
+      const allDates = [...new Set([
+        ...ideal.map(d => d.date),
+        ...actual.map(d => d.date)
+      ])].sort();
+
+      const idealMap = Object.fromEntries(ideal.map(d => [d.date, d.count]));
+      const actualMap = Object.fromEntries(actual.map(d => [d.date, d.count]));
+
+      burndownConfig = {
+        labels: allDates,
+        datasets: [
+          {
+            type: 'line',
+            label: 'Идеальный план (кумулятивно)',
+            data: allDates.map(d => idealMap[d] ?? null),
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.2,
+            fill: false,
+            pointRadius: 4,
+          },
+          {
+            type: 'bar',
+            label: 'Выполнено за день',
+            data: allDates.map(d => actualMap[d] ?? 0),
             backgroundColor: 'rgba(75, 192, 192, 0.6)',
             borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-          }]
-        };
-      } else {
-        chartError = 'Нет данных для графика';
-      }
+            borderWidth: 1,
+          }
+        ]
+      };
     } catch (e) {
-      chartError = e.message;
+      burndownError = e.message;
+      burndownConfig = null;
     } finally {
-      chartLoading = false;
+      burndownLoading = false;
     }
   }
+
+  // ----- загрузка Team Load -----
+  async function loadTeamLoad() {
+    teamLoadLoading = true;
+    teamLoadError = '';
+    try {
+      const [done, assigned] = await Promise.all([
+        fetch(`${API_BASE}/charts/teamload/${projectId}/done`, { credentials: 'include' }).then(r => {
+          if (!r.ok) throw new Error(`Done: ${r.status}`);
+          return r.json();
+        }),
+        fetch(`${API_BASE}/charts/teamload/${projectId}/assigned`, { credentials: 'include' }).then(r => {
+          if (!r.ok) throw new Error(`Assigned: ${r.status}`);
+          return r.json();
+        })
+      ]);
+
+      // Уникальный список пользователей с сохранением порядка
+      const userMap = new Map();
+      for (const u of [...done, ...assigned]) {
+        if (!userMap.has(u.user_id)) {
+          userMap.set(u.user_id, { id: u.user_id, login: u.login, fullname: u.fullname });
+        }
+      }
+      const allUsers = Array.from(userMap.values());
+
+      const doneMap = Object.fromEntries(done.map(u => [u.user_id, u.count]));
+      const assignedMap = Object.fromEntries(assigned.map(u => [u.user_id, u.count]));
+
+      teamLoadConfig = {
+        labels: allUsers.map(u => u.fullname || u.login),
+        datasets: [
+          {
+            label: 'Завершённые задачи',
+            data: allUsers.map(u => doneMap[u.id] ?? 0),
+            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1,
+          },
+          {
+            label: 'Задачи в работе',
+            data: allUsers.map(u => assignedMap[u.id] ?? 0),
+            backgroundColor: 'rgba(144, 238, 144, 0.7)',
+            borderColor: 'rgba(144, 238, 144, 1)',
+            borderWidth: 1,
+          }
+        ]
+      };
+    } catch (e) {
+      teamLoadError = e.message;
+      teamLoadConfig = null;
+    } finally {
+      teamLoadLoading = false;
+    }
+  }
+
+  // Автоматически загружаем графики при переходе на вкладку
+  $effect(() => {
+    if (activeTab === 'charts') {
+      if (!burndownConfig && !burndownLoading) loadBurndown();
+      if (!teamLoadConfig && !teamLoadLoading) loadTeamLoad();
+    }
+  });
 </script>
 
 <div class="min-h-screen bg-gray-50 py-8 px-4">
@@ -237,57 +339,75 @@
             <div class="prose max-w-none text-gray-700 whitespace-pre-wrap">{report}</div>
           {/if}
 
-                  {:else if activeTab === 'charts'}
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Графики проекта</h2>
-                    {#if !chartDataConfig && !chartLoading}
-                      <p class="text-gray-500 mb-4">График ещё не сгенерирован.</p>
-                      <div class="flex gap-2">
-                        <button
-                          onclick={generateChart}
-                          class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                        >
-                          Сгенерировать график (AI)
-                        </button>
-                        <button
-                          onclick={() => {
-                            chartDataConfig = {
-                              labels: ['Backlog', 'In Progress', 'Done'],
-                              datasets: [{
-                                label: 'Тестовые данные',
-                                data: [5, 3, 2],
-                                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                borderWidth: 1
-                              }]
-                            };
-                          }}
-                          class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500"
-                        >
-                          Тестовый график
-                        </button>
-                      </div>
-                    {:else if chartLoading}
-                      <p class="text-gray-500">Генерация графика...</p>
-                    {:else if chartError}
-                      <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">{chartError}</div>
-                      <button
-                        onclick={generateChart}
-                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                      >
-                        Попробовать снова
-                      </button>
-                    {:else}
-                      <div class="w-full max-w-lg mx-auto">
-                        <Bar data={chartDataConfig} options={{ responsive: true }} />
-                      </div>
-                      <button
-                        onclick={() => chartDataConfig = null}
-                        class="mt-4 text-sm text-gray-500 hover:text-gray-700"
-                      >
-                        Скрыть график
-                      </button>
-                    {/if}
-                  {/if}
+        {:else if activeTab === 'charts'}
+          <h2 class="text-xl font-semibold text-gray-800 mb-6">Графики проекта</h2>
+
+          <!-- Burndown Chart -->
+          <div class="mb-10">
+            <h3 class="text-lg font-medium text-gray-700 mb-3">Динамика выполнения задач (Burndown)</h3>
+            {#if burndownLoading}
+              <p class="text-gray-500">Загрузка графика Burndown...</p>
+            {:else if burndownError}
+              <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">
+                Ошибка загрузки Burndown: {burndownError}
+                <button
+                  onclick={loadBurndown}
+                  class="ml-4 underline text-red-700 hover:text-red-800"
+                >
+                  Повторить
+                </button>
+              </div>
+            {:else if burndownConfig}
+              <div class="w-full max-w-3xl mx-auto bg-white p-4 rounded-lg shadow-sm border">
+                <Bar data={burndownConfig} options={{ 
+                  responsive: true,
+                  plugins: { legend: { position: 'bottom' } },
+                  scales: {
+                    x: { title: { display: true, text: 'Дата' } },
+                    y: { title: { display: true, text: 'Количество задач' } }
+                  }
+                }} />
+              </div>
+            {:else}
+              <p class="text-gray-500">Нет данных для графика Burndown</p>
+            {/if}
+          </div>
+
+          <!-- Team Load Chart -->
+          <div>
+            <h3 class="text-lg font-medium text-gray-700 mb-3">Загрузка участников</h3>
+            {#if teamLoadLoading}
+              <p class="text-gray-500">Загрузка графика загрузки команды...</p>
+            {:else if teamLoadError}
+              <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">
+                Ошибка загрузки Team Load: {teamLoadError}
+                <button
+                  onclick={loadTeamLoad}
+                  class="ml-4 underline text-red-700 hover:text-red-800"
+                >
+                  Повторить
+                </button>
+              </div>
+            {:else if teamLoadConfig}
+              <div class="w-full max-w-2xl mx-auto bg-white p-4 rounded-lg shadow-sm border">
+                <Bar data={teamLoadConfig} options={{ 
+                  indexAxis: 'y',   // горизонтальные столбцы
+                  responsive: true,
+                  plugins: { legend: { position: 'bottom' } },
+                  scales: {
+                    x: { 
+                      title: { display: true, text: 'Количество задач' },
+                      ticks: { stepSize: 1 }
+                    },
+                    y: { title: { display: true, text: 'Участник' } }
+                  }
+                }} />
+              </div>
+            {:else}
+              <p class="text-gray-500">Нет данных о загрузке команды</p>
+            {/if}
+          </div>
+        {/if}
       </div>
     {/if}
   </div>

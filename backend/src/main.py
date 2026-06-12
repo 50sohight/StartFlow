@@ -1,13 +1,13 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from src.api.api.charts import router as router_charts
 from src.api.api.columns import router as router_columns
 from src.api.api.description import router as router_description
 from src.api.api.project_members import router as router_memebers
 from src.api.api.projects import router as router_projects
 from src.api.api.tasks import router as router_tasks
 from src.api.api.users import router as router_users
-from src.api.api.charts import router as router_charts
 from src.api.auth import router as router_auth
 from src.api.link_endpoints import router as router_links
 
@@ -17,11 +17,12 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://204.12.253.210:8080",
-        "http://localhost:5173",
-        "http://localhost:8080",
-    ],
+    # allow_origins=[
+    #     "http://204.12.253.210:8080",
+    #     "http://localhost:5173",
+    #     "http://localhost:8080",
+    # ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

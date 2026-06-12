@@ -6,7 +6,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import and_, case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.api.api.projects import get_session
 from src.models import (
     ColumnsOrm,
@@ -18,7 +17,6 @@ from src.models import (
 )
 from src.schemas.charts import ChartPoint, LastColumnRead, TeamLoadPoint
 from src.services.charts import get_last_column_for_project
-
 
 router = APIRouter(prefix="/charts", tags=["charts"])
 
@@ -42,7 +40,9 @@ async def _get_project_or_404(session: AsyncSession, project_id: UUID) -> Projec
     return project
 
 
-async def _get_last_column_or_404(session: AsyncSession, project_id: UUID) -> ColumnsOrm:
+async def _get_last_column_or_404(
+    session: AsyncSession, project_id: UUID
+) -> ColumnsOrm:
     last_column = await get_last_column_for_project(session, project_id)
     if last_column is None:
         raise HTTPException(
@@ -162,7 +162,9 @@ async def teamload_done(project_id: UUID, session: SessionDep) -> list[TeamLoadP
 
 
 @router.get("/teamload/{project_id}/assigned", response_model=list[TeamLoadPoint])
-async def teamload_assigned(project_id: UUID, session: SessionDep) -> list[TeamLoadPoint]:
+async def teamload_assigned(
+    project_id: UUID, session: SessionDep
+) -> list[TeamLoadPoint]:
     await _get_project_or_404(session, project_id)
     last_column = await _get_last_column_or_404(session, project_id)
 
