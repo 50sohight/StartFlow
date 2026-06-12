@@ -104,7 +104,7 @@
     </div>
     <button
       onclick={addColumn}
-      class="text-indigo-600 hover:text-indigo-800 text-sm font-medium mb-6"
+      class="text-green-600 hover:text-green-800 text-sm font-medium mb-6"
     >
       + Добавить колонку
     </button>
@@ -112,7 +112,7 @@
     <div class="flex justify-end">
       <button
         onclick={saveTemplate}
-        class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition"
+        class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition"
       >
         Сохранить шаблон
       </button>
