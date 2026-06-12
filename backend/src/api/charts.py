@@ -1,5 +1,6 @@
 # src/api/chart.py
 from uuid import UUID
+from src.config import settings
 
 import httpx
 from fastapi import APIRouter, HTTPException
@@ -45,7 +46,7 @@ async def get_chart_data(project: ProjectForDescription):
     timeout = httpx.Timeout(600.0, read=600.0)
     async with httpx.AsyncClient(timeout=timeout) as client:
         response = await client.post(
-            "http://204.12.253.210:8077/ai/generate",
+            f"{settings.PUBLIC_AI_URL}/ai/generate",
             json=payload.model_dump(mode="json"),
         )
         response.raise_for_status()
