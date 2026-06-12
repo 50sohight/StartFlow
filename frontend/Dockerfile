@@ -6,11 +6,13 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+
 ARG VITE_API_BASE_URL=http://204.12.253.210:8078
 ARG VITE_AI_BASE_URL=http://204.12.253.210:8077
 
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL} \
     VITE_AI_BASE_URL=${VITE_AI_BASE_URL}
+
 RUN npm run build && npm prune --omit=dev
 
 FROM node:22-alpine AS runner
