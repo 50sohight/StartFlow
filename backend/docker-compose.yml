@@ -36,6 +36,7 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Set JWT_SECRET_KEY in .env}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       ACCESS_TOKEN_EXPIRE_SECONDS: ${ACCESS_TOKEN_EXPIRE_SECONDS:-3600}
+      PUBLIC_AI_URL: ${PUBLIC_AI_URL:-http://204.12.253.210:8077}
     depends_on:
       db:
         condition: service_healthy
