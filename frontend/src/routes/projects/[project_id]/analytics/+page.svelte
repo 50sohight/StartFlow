@@ -18,7 +18,7 @@
 
   let projectId = $derived($page.params.project_id);
 
-  const API_BASE = 'http://localhost:8078';
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://204.12.253.210:8078';
 
   // ----- состояние -----
   let projectName = $state('');

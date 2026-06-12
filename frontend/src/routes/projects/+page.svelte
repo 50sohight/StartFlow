@@ -15,7 +15,7 @@
 
   onMount(async () => {
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://204.12.253.210:8078';
 
       const res = await fetch(`${API_BASE_URL}/users/my_projects`, {
       credentials: 'include'

@@ -1,4 +1,4 @@
-const AI_BASE = 'http://localhost:8001';
+const AI_BASE = import.meta.env.VITE_AI_BASE_URL || 'http://204.12.253.210:8077';
 
 export async function generateProjectReport(documents) {
   const res = await fetch(`${AI_BASE}/generate`, {
