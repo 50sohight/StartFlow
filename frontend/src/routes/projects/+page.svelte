@@ -7,10 +7,9 @@
   let loading = $state(true);
   let error = $state('');
 
-  // 🆕 Join form state
   let joinCode = $state('');
   let joinMessage = $state('');
-  let joinMessageType = $state(''); // 'success' | 'error'
+  let joinMessageType = $state(''); 
   let showJoinForm = $state(false);
 
   onMount(async () => {
@@ -66,12 +65,11 @@
             <p class="text-gray-800 font-medium text-lg mb-4">Нет активных проектов</p>
             <a
               href="/create_new_project"
-              class="inline-block py-3 px-6 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition shadow-md mb-3"
+              class="block py-3 px-6 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition shadow-md mb-3"
             >
               Создать проект
             </a>
 
-            <!-- 🆕 Присоединиться (показываем форму) -->
             {#if !showJoinForm}
               <button
                 onclick={() => showJoinForm = true}
