@@ -30,11 +30,11 @@
       </div>
       
       <!-- Декоративный элемент / Мокап интерфейса -->
-      <div class="relative lg:opacity-90 transform lg:scale-110">
+      <div class="relative lg:opacity-80 transform lg:scale-110">
         <div class="bg-white p-2 rounded-2xl shadow-2xl border border-gray-200">
           <div class="h-64 sm:h-80 bg-gray-50 rounded-xl flex items-center justify-center relative overflow-hidden">
              <!-- Схематичный мокап доски -->
-             <div class="absolute inset-0 grid grid-cols-3 gap-4 p-6 opacity-50">
+             <div class="absolute inset-0 grid grid-cols-3 gap-4 p-6 opacity-80">
                 <div class="bg-white rounded-lg shadow h-full p-3 space-y-2">
                    <div class="h-3 bg-gray-200 rounded w-3/4"></div>
                    <div class="h-24 bg-gray-100 rounded"></div>
@@ -48,15 +48,6 @@
                    <div class="h-3 bg-gray-200 rounded w-2/3"></div>
                    <div class="h-16 bg-gray-100 rounded"></div>
                 </div>
-             </div>
-             
-             <!-- Всплывашка ИИ -->
-             <div class="absolute bottom-8 right-8 bg-white p-4 rounded-xl shadow-xl border border-gray-100 text-left max-w-xs transform transition hover:scale-105">
-               <div class="flex items-center mb-2 text-green-600">
-                 <Sparkles size="16" class="mr-2" />
-                 <span class="font-semibold text-xs uppercase tracking-wider">AI Подсказка</span>
-               </div>
-               <p class="text-sm text-gray-800">Судя по задачам в "In Progress", спринт завершен на 70%. Хотите сгенерировать отчет?</p>
              </div>
           </div>
         </div>
