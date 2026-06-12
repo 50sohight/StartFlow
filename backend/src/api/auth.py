@@ -39,7 +39,7 @@ async def register(
         "access_token",
         access_token,
         httponly=True,
-        secure=True,
+        secure=False,
         samesite="lax",
         max_age=settings.ACCESS_TOKEN_EXPIRE_SECONDS
     )
@@ -68,7 +68,7 @@ async def login(
         "access_token",
         access_token,
         httponly=True,
-        secure=True,
+        secure=False,
         samesite="lax",
         max_age=settings.ACCESS_TOKEN_EXPIRE_SECONDS
     )
