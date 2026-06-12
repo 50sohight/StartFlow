@@ -11,6 +11,7 @@ from src.api.api.tasks import router as router_tasks
 from src.api.api.users import router as router_users
 from src.api.auth import router as router_auth
 from src.api.link_endpoints import router as router_links
+from src.api.statement import router as router_statement
 
 # app = FastAPI(openapi_prefix="/api")
 app = FastAPI()
@@ -45,6 +46,7 @@ app.include_router(router_memebers)
 app.include_router(router_projects)
 app.include_router(router_tasks)
 app.include_router(router_charts)
+app.include_router(router_statement)
 
 
 if __name__ == "__main__":

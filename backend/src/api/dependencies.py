@@ -2,7 +2,9 @@ from typing import Annotated
 import uuid
 
 from fastapi import Depends, Request, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.database import async_session_maker
 from src.services.auth import TokenService
 
 
@@ -23,5 +25,10 @@ def get_current_user_id(access_token: Annotated[str, Depends(get_token)]) -> uui
     user_id = uuid.UUID(data["user_id"])
     return user_id
 
-
 UserIdDep = Annotated[uuid.UUID, Depends(get_current_user_id)]
+
+async def get_session() -> AsyncSession:
+    async with async_session_maker() as session:
+        yield session
+
+SessionDep = Annotated[AsyncSession, Depends(get_session)]
