@@ -31,7 +31,6 @@
         const errText = await res.text();
         throw new Error(errText || `Ошибка ${res.status}`);
       }
-      // Эндпоинт возвращает только строку токена, не JSON
       inviteToken = await res.text();
       showInvite = true;
       copied = false;
@@ -41,7 +40,7 @@
   }
 
   async function copyLink() {
-    const joinUrl = `${window.location.origin}/join?code=${inviteToken}`;
+    const joinUrl = inviteToken;
     try {
       await navigator.clipboard.writeText(joinUrl);
       copied = true;
@@ -246,7 +245,7 @@
         <div class="flex items-center gap-2">
           <input
             readonly
-            value={`${window.location.origin}/join?code=${inviteToken}`}
+            value={inviteToken.replace(/^["']|["']$/g, '')}
             class="flex-1 px-3 py-2 border border-gray-300 rounded bg-gray-50 text-sm"
           />
           <button
