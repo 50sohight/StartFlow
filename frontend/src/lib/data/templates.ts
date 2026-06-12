@@ -96,6 +96,8 @@ const builtInTemplates: BoardTemplate[] = [
   },
 ];
 
+export const templates = builtInTemplates;
+
 // ---------- Пользовательские шаблоны (localStorage) ----------
 const STORAGE_KEY = 'userTemplates';
 
