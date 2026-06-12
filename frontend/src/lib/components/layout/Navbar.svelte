@@ -167,7 +167,6 @@
     <div class="flex-1 p-4 space-y-2">
       <a href="/#features" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium" onclick = {closeMobile}>Возможности</a>
       <a href="/#templates" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium" onclick = {closeMobile}>Шаблоны</a>
-      <a href="#" class="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium" onclick = {closeMobile}>Цены</a>
     </div>
 
     <!-- Блок авторизации внизу -->
