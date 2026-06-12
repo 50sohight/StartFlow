@@ -11,7 +11,7 @@
   <p class="text-sm text-gray-600 mt-1">{template.description}</p>
   <div class="mt-2 text-xs text-gray-500">
     {#if template.columns.length > 0}
-      Колонки: {template.columns.map(c => c.title).join(', ')}
+      Колонки: {template.columns.map(c => c.name).join(', ')}
     {:else}
       Пустая доска
     {/if}

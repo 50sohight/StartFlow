@@ -15,7 +15,7 @@
 
   onMount(async () => {
     try {
-      const res = await fetch('http://localhost:8000/users/my_projects', {
+      const res = await fetch('http://localhost:8080/users/my_projects', {
         credentials: 'include'
       });
       if (!res.ok) throw new Error('Ошибка загрузки проектов');

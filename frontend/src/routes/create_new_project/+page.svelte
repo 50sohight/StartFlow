@@ -2,19 +2,27 @@
   import { onMount } from 'svelte';
   import { authStore } from '$lib/stores/authStore.js';
   import { goto } from '$app/navigation';
-  import { templates } from '$lib/data/templates.js';
+  import { allTemplates } from '$lib/data/templates.js';
   import Button from '$lib/components/ui/Button.svelte';
   import TemplateCard from '$lib/components/TemplateCard.svelte';
   import Modal from '$lib/components/ui/Modal.svelte';
 
-  // Реактивные переменные
+  let templates = $state([]);
+    onMount(() => {
+      const unsubscribe = allTemplates.subscribe(value => {
+        templates = value;
+      });
+      return unsubscribe;
+    });
+
   let name = $state('');
   let description = $state('');
-  let selectedTemplate = $state(templates.find(t => t.id === 'empty') || templates[0]);
+  let selectedTemplate = $derived(templates.find(t => t.id === 'empty') || templates[0]);
   let loading = $state(false);
   let error = $state('');
   let showSuccess = $state(false);
   let inviteCode = $state('');
+
 
   const API_BASE = 'http://localhost:8080';
 
@@ -59,7 +67,7 @@
             credentials: 'include',
             body: JSON.stringify({
               project_id: projectId,
-              name: colTemplate.title,
+              name: colTemplate.name,
               position: index
             })
           });
@@ -142,6 +150,12 @@
     </div>
 
     <h2 class="text-lg font-semibold text-gray-800 mb-3">Выберите шаблон</h2>
+      <button
+          onclick={() => goto('/create_template')}
+          class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+        >
+          + Новый шаблон
+      </button>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
       {#each templates as tpl (tpl.id)}
         <TemplateCard

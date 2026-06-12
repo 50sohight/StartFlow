@@ -8,6 +8,8 @@
   let message = $state('');
   let messageType = $state(''); // 'success' | 'error'
 
+  const API_BASE = `http://localhost:8080`
+
   onMount(async () => {
     await authStore.fetchUser();
     if (!$authStore) {
@@ -22,7 +24,7 @@
       return;
     }
     try {
-      const res = await fetch(`http://localhost:8000/link/use_link/${encodeURIComponent(code.trim())}`, {
+      const res = await fetch(`${API_BASE}/link/use_link/${encodeURIComponent(code.trim())}`, {
         method: 'POST',
         credentials: 'include'
       });
