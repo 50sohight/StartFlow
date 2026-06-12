@@ -94,17 +94,6 @@ const builtInTemplates: BoardTemplate[] = [
       { id: 'e-3', name: 'Готово', tasks: [] },
     ],
   },
-  {
-    id: 'ss',
-    name: 'SyropyatovSpecial',
-    description:
-      'Специальный шаблон от Егора Сыропятова (TM), призванный в разы ускорить разработку продуктов',
-    columns: [
-      { id: 'd-1', name: 'Начать', tasks: [{ id: 'col-1', title: 'Делайть бабки' }] },
-      { id: 'd-2', name: 'Сделать', tasks: [] },
-      { id: 'd-3', name: 'Кончить', tasks: [] },
-    ],
-  },
 ];
 
 // ---------- Пользовательские шаблоны (localStorage) ----------
