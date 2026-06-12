@@ -8,6 +8,7 @@ from src.api.api.projects import router as router_projects
 from src.api.api.tasks import router as router_tasks
 from src.api.api.users import router as router_users
 from src.api.auth import router as router_auth
+from src.api.charts import router as router_charts
 from src.api.link_endpoints import router as router_links
 
 # app = FastAPI(openapi_prefix="/api")
@@ -37,6 +38,7 @@ app.include_router(router_columns)
 app.include_router(router_memebers)
 app.include_router(router_projects)
 app.include_router(router_tasks)
+app.include_router(router_charts)
 
 
 if __name__ == "__main__":

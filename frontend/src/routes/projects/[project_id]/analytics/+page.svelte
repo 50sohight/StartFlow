@@ -1,16 +1,31 @@
-<!-- Очевидно я не могу обратиться к модели потому что CORS 
- и протестить функционал не могу -->
-
 <script>
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { authStore } from '$lib/stores/authStore.js';
   import { goto } from '$app/navigation';
-  import Button from '$lib/components/ui/Button.svelte';
+  import { Bar } from 'svelte-chartjs';
+  import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+  } from 'chart.js';
+
+  ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+  let projectId = $derived($page.params.project_id);
+
+  const API_BASE = 'http://localhost:8080';   
 
   // ----- состояние -----
-  let project = $state(null);            // данные проекта
-  let activeTab = $state('description'); // текущая вкладка
+  let projectName = $state('');
+  let loadingProject = $state(true);
+  let projectError = $state('');
+
+  let activeTab = $state('description');
 
   let description = $state('');
   let descriptionLoading = $state(false);
@@ -20,21 +35,11 @@
   let reportLoading = $state(false);
   let reportError = $state('');
 
-  let chartData = $state(null);          // { labels, values, title, chart_type }
+  let chartDataConfig = $state(null);
   let chartLoading = $state(false);
+  let chartError = $state('');
 
-  let loadingProject = $state(true);
-  let projectError = $state('');
-
-  // ID проекта – в реальном приложении брать из $page.params.project_id
-  const projectId = '513b1268-5907-43a2-9c09-7bd75ee3c345';
-
-  // Базовый URL локального API (прокси)
-  const API_BASE = 'http://localhost:8080';
-  // URL AI‑сервиса (для прямых вызовов из фронта – только для отладки)
-  const AI_BASE = 'http://204.12.253.210:8077';
-
-  // ----- загрузка проекта -----
+  // ----- загрузка базовой информации о проекте -----
   onMount(async () => {
     await authStore.fetchUser();
     if (!$authStore) {
@@ -47,7 +52,8 @@
         credentials: 'include'
       });
       if (!res.ok) throw new Error('Проект не найден');
-      project = await res.json();
+      const project = await res.json();
+      projectName = project.name;
     } catch (e) {
       projectError = e.message;
     } finally {
@@ -55,7 +61,7 @@
     }
   });
 
-  // ----- генерация описания (через бэкенд-прокси) -----
+  // ----- генерация описания -----
   async function generateDescription() {
     descriptionLoading = true;
     descriptionError = '';
@@ -77,55 +83,14 @@
     }
   }
 
-  // ----- вспомогательная функция: превращаем проект в InfoForGenerate -----
-  function buildInfoForGenerate(project) {
-    // Задачи лежат внутри колонок – собираем в плоский список
-    const tasks = [];
-    if (project.columns) {
-      for (const col of project.columns) {
-        if (col.tasks) {
-          tasks.push(...col.tasks);
-        }
-      }
-    }
-    // Приводим к формату TaskRead (поля должны совпадать)
-    const mappedTasks = tasks.map(t => ({
-      title: t.title,
-      description: t.description || '',
-      deadline: t.deadline,
-      project_id: t.project_id,
-      column_id: t.column_id,
-      id: t.id,
-      created_at: t.created_at,
-      updated_at: t.updated_at
-    }));
-
-    return {
-      name: project.name,
-      description: project.description || null,
-      status: project.status,
-      created_at: project.created_at,
-      updated_at: project.updated_at,
-      tasks: mappedTasks
-    };
-  }
-
-  // ----- генерация отчёта (вызов AI напрямую, временно) -----
+  // ----- генерация отчёта -----
   async function generateReport() {
-    if (!project) return;
     reportLoading = true;
     reportError = '';
     try {
-      const payload = {
-        documents: buildInfoForGenerate(project),
-        temperature: 0.3,
-        top_k: 40,
-        max_tokens: 2048
-      };
-      const res = await fetch(`${AI_BASE}/ai/generate/report`, {
+      const res = await fetch(`${API_BASE}/report/${projectId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        credentials: 'include'
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -140,20 +105,41 @@
     }
   }
 
-  // ----- (опционально) загрузка данных для графика -----
-  async function loadChart() {
-    // В будущем можно запросить chart_data у AI‑сервиса,
-    // передав response_type: 'chart'. Пока заглушка.
+  // ----- генерация графика -----
+  async function generateChart() {
     chartLoading = true;
-    // ... вызов endpoint, который вернёт { chart_data: ... }
-    chartLoading = false;
-  }
-
-  // ----- переключение вкладок -----
-  function switchTab(tab) {
-    activeTab = tab;
-    // При переключении на графики можно дёрнуть loadChart(), если нужно
-    if (tab === 'charts' && !chartData) loadChart();
+    chartError = '';
+    try {
+      const res = await fetch(`${API_BASE}/ai/chart/${projectId}`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Ошибка генерации графика');
+      }
+      const data = await res.json();
+      // data.chart_data = { labels, values, title, chart_type }
+      if (data.chart_data) {
+        const cd = data.chart_data;
+        chartDataConfig = {
+          labels: cd.labels,
+          datasets: [{
+            label: cd.title,
+            data: cd.values,
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          }]
+        };
+      } else {
+        chartError = 'Нет данных для графика';
+      }
+    } catch (e) {
+      chartError = e.message;
+    } finally {
+      chartLoading = false;
+    }
   }
 </script>
 
@@ -170,9 +156,7 @@
     </div>
 
     <h1 class="text-3xl font-bold text-gray-900 mb-2">Аналитика проекта</h1>
-    {#if project}
-      <p class="text-gray-600 mb-6">{project.name}</p>
-    {/if}
+    <p class="text-gray-600 mb-6">{projectName}</p>
 
     {#if loadingProject}
       <div class="bg-white rounded-xl shadow p-6 text-center text-gray-500">
@@ -184,19 +168,19 @@
       <!-- Переключатель вкладок -->
       <div class="flex space-x-2 mb-8">
         <button
-          onclick={() => switchTab('description')}
+          onclick={() => activeTab = 'description'}
           class="px-4 py-2 rounded-lg font-medium transition {activeTab === 'description' ? 'bg-indigo-100 text-indigo-700' : 'bg-white text-gray-600 hover:bg-gray-50'}"
         >
           Описание
         </button>
         <button
-          onclick={() => switchTab('report')}
+          onclick={() => activeTab = 'report'}
           class="px-4 py-2 rounded-lg font-medium transition {activeTab === 'report' ? 'bg-indigo-100 text-indigo-700' : 'bg-white text-gray-600 hover:bg-gray-50'}"
         >
           Отчёт
         </button>
         <button
-          onclick={() => switchTab('charts')}
+          onclick={() => activeTab = 'charts'}
           class="px-4 py-2 rounded-lg font-medium transition {activeTab === 'charts' ? 'bg-indigo-100 text-indigo-700' : 'bg-white text-gray-600 hover:bg-gray-50'}"
         >
           Графики
@@ -209,13 +193,22 @@
           <h2 class="text-xl font-semibold text-gray-800 mb-4">Описание проекта</h2>
           {#if !description && !descriptionLoading}
             <p class="text-gray-500 mb-4">Описание ещё не сгенерировано.</p>
-            <Button on:click={generateDescription}>
+            <button
+              onclick={generateDescription}
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
               Сгенерировать описание
-            </Button>
+            </button>
           {:else if descriptionLoading}
             <p class="text-gray-500">Генерация описания...</p>
           {:else if descriptionError}
             <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">{descriptionError}</div>
+            <button
+              onclick={generateDescription}
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              Попробовать снова
+            </button>
           {:else}
             <div class="prose max-w-none text-gray-700 whitespace-pre-wrap">{description}</div>
           {/if}
@@ -224,27 +217,50 @@
           <h2 class="text-xl font-semibold text-gray-800 mb-4">Отчёт ИИ-ассистента</h2>
           {#if !report && !reportLoading}
             <p class="text-gray-500 mb-4">Отчёт ещё не сгенерирован.</p>
-            <Button on:click={generateReport}>
+            <button
+              onclick={generateReport}
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
               Сгенерировать отчёт
-            </Button>
+            </button>
           {:else if reportLoading}
             <p class="text-gray-500">Генерация отчёта...</p>
           {:else if reportError}
             <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">{reportError}</div>
+            <button
+              onclick={generateReport}
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              Попробовать снова
+            </button>
           {:else}
             <div class="prose max-w-none text-gray-700 whitespace-pre-wrap">{report}</div>
           {/if}
 
         {:else if activeTab === 'charts'}
-          <h2 class="text-xl font-semibold text-gray-800 mb-4">Графики</h2>
-          {#if chartData}
-            <!-- Здесь можно вставить компонент графика (Chart.js и т.п.) -->
-            <p>Тип: {chartData.chart_type}</p>
-            <pre>{JSON.stringify(chartData, null, 2)}</pre>
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Графики проекта</h2>
+          {#if !chartDataConfig && !chartLoading}
+            <p class="text-gray-500 mb-4">График ещё не сгенерирован.</p>
+            <button
+              onclick={generateChart}
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              Сгенерировать график
+            </button>
+          {:else if chartLoading}
+            <p class="text-gray-500">Генерация графика...</p>
+          {:else if chartError}
+            <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">{chartError}</div>
+            <button
+              onclick={generateChart}
+              class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+              Попробовать снова
+            </button>
           {:else}
-            <p class="text-gray-500">
-              Графики станут доступны после запроса к аналитическому модулю.
-            </p>
+            <div class="w-full max-w-lg mx-auto">
+              <Bar data={chartDataConfig} options={{ responsive: true }} />
+            </div>
           {/if}
         {/if}
       </div>
