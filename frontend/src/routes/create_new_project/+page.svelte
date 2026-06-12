@@ -151,7 +151,7 @@
     <h2 class="text-lg font-semibold text-gray-800 mb-3">Выберите шаблон</h2>
       <button
           onclick={() => goto('/create_template')}
-          class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+          class="mb-5 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
         >
           + Новый шаблон
       </button>
