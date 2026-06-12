@@ -1,23 +1,23 @@
 // src/lib/data/templates.ts
 
-// ---------- API-compatible interfaces (used by Kanban and real board) ----------
+// ---------- API-совместимые интерфейсы ----------
 export interface Task {
   id: string;
   title: string;
   description?: string;
   deadline?: string;       // ISO datetime string
   column_id: string;
-  project_id?: string;     // optional, always set after load
+  project_id?: string;
 }
 
 export interface Column {
   id: string;
-  name: string;            // API and Kanban use "name"
+  name: string;
   position: number;
   tasks: Task[];
 }
 
-// ---------- Template-specific types (lightweight, no position/column_id) ----------
+// ---------- Типы для шаблонов ----------
 export interface TaskTemplate {
   id: string;
   title: string;
@@ -25,7 +25,7 @@ export interface TaskTemplate {
 
 export interface ColumnTemplate {
   id: string;
-  name: string;            // templates now also use "name"
+  name: string;            // шаблоны используют "name"
   tasks: TaskTemplate[];
 }
 
@@ -36,8 +36,8 @@ export interface BoardTemplate {
   columns: ColumnTemplate[];
 }
 
-// ---------- Pre-made templates ----------
-export const templates: BoardTemplate[] = [
+// ---------- Встроенные шаблоны ----------
+const builtInTemplates: BoardTemplate[] = [
   {
     id: 'kanban',
     name: 'Kanban',
@@ -106,3 +106,45 @@ export const templates: BoardTemplate[] = [
     ],
   },
 ];
+
+// ---------- Пользовательские шаблоны (localStorage) ----------
+const STORAGE_KEY = 'userTemplates';
+
+function loadUserTemplates(): BoardTemplate[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {
+    console.error('Ошибка загрузки пользовательских шаблонов:', e);
+  }
+  return [];
+}
+
+function saveUserTemplates(templates: BoardTemplate[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(templates));
+}
+
+// Функция для добавления нового пользовательского шаблона
+export function addUserTemplate(template: BoardTemplate) {
+  const userTemplates = loadUserTemplates();
+  // Генерируем уникальный id
+  const newTemplate: BoardTemplate = {
+    ...template,
+    id: `user-${Date.now()}`,
+  };
+  userTemplates.push(newTemplate);
+  saveUserTemplates(userTemplates);
+  // Обновляем хранилище
+  allTemplates.set([...builtInTemplates, ...userTemplates]);
+}
+
+// ---------- Реактивное хранилище всех шаблонов ----------
+import { writable } from 'svelte/store';
+
+export const allTemplates = writable<BoardTemplate[]>([
+  ...builtInTemplates,
+  ...loadUserTemplates(),
+]);

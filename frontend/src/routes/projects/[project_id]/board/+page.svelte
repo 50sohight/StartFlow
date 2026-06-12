@@ -6,7 +6,7 @@
   import type { Column, Task } from '$lib/data/templates';
 
   let projectId = page.params.project_id;    // derived from rune, no $ needed
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = 'http://localhost:8078';
 
   let columns = $state<Column[]>([]);
   let initialColumns = $state<Column[]>([]);
@@ -15,6 +15,49 @@
   let saving = $state(false);
   let error = $state<string | null>(null);
   let unsavedChanges = $derived(JSON.stringify(columns) !== JSON.stringify(initialColumns));
+  let inviteToken = $state('');
+  let showInvite = $state(false);
+  let copied = $state(false);
+  let inviteError = $state('');
+
+  async function generateInviteLink() {
+    inviteError = '';
+    try {
+      const res = await fetch(`${BASE_URL}/link/generate_link/${projectId}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || `Ошибка ${res.status}`);
+      }
+      // Эндпоинт возвращает только строку токена, не JSON
+      inviteToken = await res.text();
+      showInvite = true;
+      copied = false;
+    } catch (e: any) {
+      inviteError = e.message;
+    }
+  }
+
+  async function copyLink() {
+    const joinUrl = `${window.location.origin}/join?code=${inviteToken}`;
+    try {
+      await navigator.clipboard.writeText(joinUrl);
+      copied = true;
+      setTimeout(() => copied = false, 2000);
+    } catch {
+      // fallback для старых браузеров
+      const input = document.createElement('input');
+      input.value = joinUrl;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      copied = true;
+      setTimeout(() => copied = false, 2000);
+    }
+  }
 
   async function loadProject() {
     loading = true;
@@ -185,8 +228,46 @@
     >
       {saving ? 'Сохранение...' : 'Сохранить'}
     </button>
+    <button
+      class="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+      onclick={generateInviteLink}
+    >
+      Пригласить
+    </button>
   </div>
 </div>
+  {#if showInvite}
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
+        <h3 class="text-lg font-semibold mb-3">Ссылка для приглашения</h3>
+        <p class="text-sm text-gray-500 mb-4">
+          Отправьте эту ссылку участнику, чтобы он присоединился к проекту.
+        </p>
+        <div class="flex items-center gap-2">
+          <input
+            readonly
+            value={`${window.location.origin}/join?code=${inviteToken}`}
+            class="flex-1 px-3 py-2 border border-gray-300 rounded bg-gray-50 text-sm"
+          />
+          <button
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onclick={copyLink}
+          >
+            {copied ? 'Скопировано' : 'Копировать'}
+          </button>
+        </div>
+        {#if inviteError}
+          <p class="text-red-500 text-sm mt-2">{inviteError}</p>
+        {/if}
+        <button
+          class="mt-4 text-gray-500 hover:text-gray-700"
+          onclick={() => { showInvite = false; inviteToken = ''; }}
+        >
+          Закрыть
+        </button>
+      </div>
+    </div>
+  {/if}
 
   {#if error}
     <div class="mb-4 p-3 bg-red-100 border border-red-300 text-red-800 rounded-lg">

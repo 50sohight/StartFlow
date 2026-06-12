@@ -7,5 +7,8 @@ export default defineConfig({
 		sveltekit(), 
 		tailwindcss()
 	],
+	ssr: {
+		noExternal: ['svelte-chartjs']
+	}
 })
 ;
