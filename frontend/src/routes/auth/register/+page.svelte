@@ -4,11 +4,11 @@
   import { goto } from '$app/navigation';
   import Button from '$lib/components/ui/Button.svelte';
 
-  let fullname = '';
-  let login = '';
-  let password = '';
-  let error = '';
-  let loading = false;
+  let fullname = $state('');
+  let login = $state('');
+  let password = $state('');
+  let error = $state('');
+  let loading = $state(false);
 
   async function handleRegister() {
     error = '';

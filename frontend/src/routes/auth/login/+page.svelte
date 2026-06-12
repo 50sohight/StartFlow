@@ -3,10 +3,10 @@
   import { goto } from '$app/navigation';
   import Button from '$lib/components/ui/Button.svelte';
 
-  let login = '';
-  let password = '';
-  let error = '';
-  let loading = false;
+  let login = $state('');
+  let password = $state('');
+  let error = $state('');
+  let loading = $state(false);
 
   async function handleLogin() {
     error = '';
