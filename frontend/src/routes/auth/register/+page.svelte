@@ -73,8 +73,8 @@
             type="password"
             bind:value={password}
             required
-            class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
-            placeholder="••••••••"
+            class="placeholder:text-xs mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 outline-none transition"
+            placeholder="Пароль: минимум 8 символов, заглавные и спецсимволы"
           />
         </div>
 

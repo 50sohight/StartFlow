@@ -1,12 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { page } from '$app/state';          // reactive page object (rune)
+  import { page } from '$app/state'; 
   import KanbanBoard from '$lib/components/ui/Kanban.svelte';
   import { goto } from '$app/navigation';
   import type { Column, Task } from '$lib/data/templates';
 
-  let projectId = page.params.project_id;    // derived from rune, no $ needed
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://204.12.253.210:8078';
+  let projectId = page.params.project_id;    
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8078';
 
   let columns = $state<Column[]>([]);
   let initialColumns = $state<Column[]>([]);

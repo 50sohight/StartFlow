@@ -8,7 +8,7 @@
   let message = $state('');
   let messageType = $state(''); // 'success' | 'error'
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://204.12.253.210:8078';
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8078';
 
   onMount(async () => {
     await authStore.fetchUser();
