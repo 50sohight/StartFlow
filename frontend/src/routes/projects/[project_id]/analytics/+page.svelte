@@ -46,9 +46,10 @@
   let descriptionLoading = $state(false);
   let descriptionError = $state('');
 
-  let report = $state('');
+  // Отчёт: теперь работаем с PDF, текстового содержимого нет
   let reportLoading = $state(false);
   let reportError = $state('');
+  let reportSuccess = $state(false);
 
   // ----- состояния для графиков -----
   let burndownConfig = $state(null);
@@ -103,21 +104,58 @@
     }
   }
 
-  // ----- генерация отчёта -----
+  // ----- генерация отчёта (скачивание PDF) -----
   async function generateReport() {
     reportLoading = true;
     reportError = '';
+    reportSuccess = false;
+
     try {
       const res = await fetch(`${API_BASE}/statement/${projectId}`, {
         method: 'POST',
         credentials: 'include'
       });
+
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || 'Ошибка генерации отчёта');
+        let errorMsg = `Ошибка ${res.status}`;
+        try {
+          const errJson = await res.json();
+          errorMsg = errJson.detail || errorMsg;
+        } catch {
+          errorMsg = await res.text() || errorMsg;
+        }
+        throw new Error(errorMsg);
       }
-      const data = await res.json();
-      report = data.text_response || 'Пустой ответ';
+
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/pdf')) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+
+        // Пытаемся извлечь имя файла из Content-Disposition
+        const disposition = res.headers.get('content-disposition');
+        let filename = `отчет_${projectId}.pdf`;
+        if (disposition && disposition.includes('filename=')) {
+          const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+          if (match && match[1]) {
+            filename = match[1].replace(/['"]/g, '');
+          }
+        }
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        reportSuccess = true;
+        // Через 3 секунды убираем сообщение об успехе
+        setTimeout(() => {
+          reportSuccess = false;
+        }, 3000);
+      } else {
+        throw new Error('Сервер вернул не PDF, а ' + (contentType || 'неизвестный тип'));
+      }
     } catch (e) {
       reportError = e.message;
     } finally {
@@ -141,7 +179,6 @@
         })
       ]);
 
-      // Собираем все даты, сортируем
       const allDates = [...new Set([
         ...ideal.map(d => d.date),
         ...actual.map(d => d.date)
@@ -197,7 +234,6 @@
         })
       ]);
 
-      // Уникальный список пользователей с сохранением порядка
       const userMap = new Map();
       for (const u of [...done, ...assigned]) {
         if (!userMap.has(u.user_id)) {
@@ -317,26 +353,42 @@
 
         {:else if activeTab === 'report'}
           <h2 class="text-xl font-semibold text-gray-800 mb-4">Отчёт ИИ-ассистента</h2>
-          {#if !report && !reportLoading}
-            <p class="text-gray-500 mb-4">Отчёт ещё не сгенерирован.</p>
+          {#if !reportLoading && !reportSuccess && !reportError}
+            <p class="text-gray-500 mb-4">Нажмите кнопку, чтобы сгенерировать и скачать PDF-отчёт.</p>
             <button
               onclick={generateReport}
               class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
-              Сгенерировать отчёт
+              Скачать отчёт (PDF)
             </button>
           {:else if reportLoading}
-            <p class="text-gray-500">Генерация отчёта...</p>
+            <div class="flex items-center space-x-3">
+              <svg class="animate-spin h-5 w-5 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p class="text-gray-500">Генерация отчёта... Подождите, это может занять некоторое время.</p>
+            </div>
           {:else if reportError}
-            <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">{reportError}</div>
+            <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-4">
+              Ошибка: {reportError}
+            </div>
             <button
               onclick={generateReport}
               class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
               Попробовать снова
             </button>
-          {:else}
-            <div class="prose max-w-none text-gray-700 whitespace-pre-wrap">{report}</div>
+          {:else if reportSuccess}
+            <div class="bg-green-50 text-green-700 p-4 rounded-xl mb-4">
+              ✅ Отчёт успешно сгенерирован и скачан. Файл сохранён в папке "Загрузки".
+            </div>
+            <button
+              onclick={generateReport}
+              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            >
+              Скачать ещё раз
+            </button>
           {/if}
 
         {:else if activeTab === 'charts'}
@@ -359,7 +411,7 @@
               </div>
             {:else if burndownConfig}
               <div class="w-full max-w-3xl mx-auto bg-white p-4 rounded-lg shadow-sm border">
-                <Bar data={burndownConfig} options={{ 
+                <Bar data={burndownConfig} options={{
                   responsive: true,
                   plugins: { legend: { position: 'bottom' } },
                   scales: {
@@ -390,12 +442,12 @@
               </div>
             {:else if teamLoadConfig}
               <div class="w-full max-w-2xl mx-auto bg-white p-4 rounded-lg shadow-sm border">
-                <Bar data={teamLoadConfig} options={{ 
-                  indexAxis: 'y',   // горизонтальные столбцы
+                <Bar data={teamLoadConfig} options={{
+                  indexAxis: 'y',
                   responsive: true,
                   plugins: { legend: { position: 'bottom' } },
                   scales: {
-                    x: { 
+                    x: {
                       title: { display: true, text: 'Количество задач' },
                       ticks: { stepSize: 1 }
                     },
