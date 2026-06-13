@@ -16,7 +16,7 @@ class ModelRequest(BaseModel):
     documents: List[str] = []
     temperature: float = 0.3
     top_k: int = 40
-    max_tokens: int = 2048
+    max_tokens: int = 512
     # Либо работаем с текстом - text, либо с графиком - chart
     response_type: Literal["text", "chart"] = "text"
 
@@ -57,14 +57,14 @@ class DescriptionRequest(BaseModel):
     documents: InfoForGenerate
     temperature: float = 0.4
     top_k: int = 40
-    max_tokens: int = 2048
+    max_tokens: int = 512
 
 class ReportRequest(BaseModel):
     """Схема для генерации отчетов"""
     documents: InfoForGenerate
     temperature: float = 0.3
     top_k: int = 40
-    max_tokens: int = 2048
+    max_tokens: int = 512
 
 
 
