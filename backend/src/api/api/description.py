@@ -21,7 +21,7 @@ async def get_description(project:ProjectForDescription):
         documents=project,
         temperature=0.4,
         top_k=40,
-        max_tokens=512
+        max_tokens=256
     )
     timeout = httpx.Timeout(600.0, read=600.0)
     async with httpx.AsyncClient(timeout=timeout) as client:
